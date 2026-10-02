@@ -361,9 +361,11 @@ async def download_openai_file(
     download_link: str,
 ) -> bytes:
     """
-    Downloads the temporary file supplied by GPT Actions.
+    Preuzima privremeni OpenAI file URL.
 
-    We only allow OpenAI's file host to avoid SSRF.
+    Dopušta samo HTTPS URL-ove na OpenAI domenama.
+    Redirecti su dopušteni, ali se nakon redirecta ponovno
+    provjerava konačni hostname.
     """
 
     parsed = urlparse(download_link)
@@ -371,13 +373,27 @@ async def download_openai_file(
     if parsed.scheme != "https":
         raise HTTPException(
             status_code=400,
-            detail="Neispravan download URL.",
+            detail="Download URL mora koristiti HTTPS.",
         )
 
-    if parsed.hostname != ALLOWED_DOWNLOAD_HOST:
+    initial_host = (parsed.hostname or "").lower()
+
+    def is_allowed_openai_host(host: str) -> bool:
+        host = host.lower().rstrip(".")
+
+        return (
+            host == "openai.com"
+            or host.endswith(".openai.com")
+            or host == "oaiusercontent.com"
+            or host.endswith(".oaiusercontent.com")
+        )
+
+    if not is_allowed_openai_host(initial_host):
         raise HTTPException(
             status_code=400,
-            detail="Nedozvoljen download host.",
+            detail=(
+                f"Nedozvoljeni download host: {initial_host}"
+            ),
         )
 
     timeout = httpx.Timeout(
@@ -390,7 +406,7 @@ async def download_openai_file(
     try:
         async with httpx.AsyncClient(
             timeout=timeout,
-            follow_redirects=False,
+            follow_redirects=True,
         ) as client:
 
             response = await client.get(
@@ -402,6 +418,19 @@ async def download_openai_file(
             status_code=502,
             detail=(
                 f"Ne mogu preuzeti uploadanu datoteku: {exc}"
+            ),
+        )
+
+    final_host = (
+        response.url.host or ""
+    ).lower()
+
+    if not is_allowed_openai_host(final_host):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Download URL se preusmjerio na "
+                f"nedozvoljeni host: {final_host}"
             ),
         )
 
