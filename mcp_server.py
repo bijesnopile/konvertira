@@ -5,13 +5,13 @@ import tempfile
 import time
 from pathlib import Path
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
-from pydantic import BaseModel, ConfigDict, HttpUrl
-
-from mcp.server.mcpserver import MCPServer
+from mcp.server import MCPServer
 from mcp.server.transport_security import TransportSecuritySettings
-from mcp_types import ToolAnnotations
+from mcp.types import ToolAnnotations
+from pydantic import BaseModel, ConfigDict, HttpUrl
 
 from main import (
     MAX_IMAGE_SIZE,
@@ -20,6 +20,13 @@ from main import (
     get_content_type,
     remove_metadata,
 )
+
+
+# ============================================================
+# ENVIRONMENT
+# ============================================================
+
+load_dotenv()
 
 
 # ============================================================
@@ -58,27 +65,44 @@ mcp = MCPServer(
     name="Image Privacy Protector",
     version="1.0.0",
     instructions=(
-        "Use remove_image_metadata when a user asks to remove "
-        "embedded metadata from one uploaded JPEG, PNG, or WEBP image. "
-        "Process exactly one image per call."
+        "Use remove_image_metadata when the user asks to remove "
+        "embedded metadata from exactly one uploaded JPEG, PNG, "
+        "or WEBP image."
     ),
 )
 
 
 # ============================================================
-# FILE MODELS
+# FILE MODEL
 # ============================================================
 
 class OpenAIFile(BaseModel):
+    """
+    File object supplied by ChatGPT for an MCP file input.
+
+    OpenAI requires:
+        download_url
+        file_id
+
+    Optional:
+        mime_type
+        file_name
+    """
+
     model_config = ConfigDict(
         extra="forbid"
     )
 
     download_url: HttpUrl
     file_id: str
+
     mime_type: str | None = None
     file_name: str | None = None
 
+
+# ============================================================
+# RESPONSE MODEL
+# ============================================================
 
 class ProcessedImage(BaseModel):
     success: bool
@@ -93,6 +117,10 @@ class ProcessedImage(BaseModel):
 # ============================================================
 
 def cleanup_old_files() -> None:
+    """
+    Removes temporary processed images older than the TTL.
+    """
+
     now = time.time()
 
     for path in STORAGE_DIR.iterdir():
@@ -107,6 +135,7 @@ def cleanup_old_files() -> None:
                 path.unlink(missing_ok=True)
 
         except OSError:
+            # Cleanup failure should not break image processing.
             pass
 
 
@@ -118,32 +147,39 @@ def cleanup_old_files() -> None:
     name="remove_image_metadata",
     title="Remove image metadata",
     description=(
-        "Removes embedded metadata such as EXIF, GPS, camera and "
-        "date metadata from exactly one uploaded JPEG, PNG or WEBP image. "
-        "Use this tool when the user asks to clean or remove image metadata. "
-        "The original image is not modified."
+        "Removes embedded metadata such as EXIF, GPS, camera, "
+        "date, and related metadata from exactly one uploaded "
+        "JPEG, PNG, or WEBP image. The original image is not "
+        "modified."
     ),
     annotations=ToolAnnotations(
-        readOnlyHint=False,
-        destructiveHint=False,
-        openWorldHint=False,
-        idempotentHint=True,
+        read_only_hint=False,
+        destructive_hint=False,
+        open_world_hint=False,
+        idempotent_hint=True,
     ),
     meta={
         "openai/fileParams": ["file"],
-        "openai/toolInvocation/invoking": "Removing image metadata…",
-        "openai/toolInvocation/invoked": "Image cleaned",
+        "openai/toolInvocation/invoking": (
+            "Removing image metadata..."
+        ),
+        "openai/toolInvocation/invoked": (
+            "Image cleaned"
+        ),
     },
     structured_output=True,
 )
 async def remove_image_metadata(
     file: OpenAIFile,
 ) -> ProcessedImage:
+    """
+    Remove metadata from one uploaded image.
+    """
 
     cleanup_old_files()
 
     # --------------------------------------------------------
-    # VALIDATE MIME
+    # MIME TYPE
     # --------------------------------------------------------
 
     if (
@@ -156,7 +192,7 @@ async def remove_image_metadata(
         )
 
     # --------------------------------------------------------
-    # DOWNLOAD FROM CHATGPT
+    # DOWNLOAD IMAGE FROM CHATGPT
     # --------------------------------------------------------
 
     image_bytes = await download_openai_file(
@@ -182,7 +218,7 @@ async def remove_image_metadata(
     )
 
     # --------------------------------------------------------
-    # TEMP RESULT
+    # TEMPORARY STORAGE
     # --------------------------------------------------------
 
     token = secrets.token_urlsafe(32)
@@ -191,16 +227,26 @@ async def remove_image_metadata(
         "JPEG": ".jpg",
         "PNG": ".png",
         "WEBP": ".webp",
-    }[image_format]
+    }.get(image_format)
+
+    if not extension:
+        raise ValueError(
+            f"Unsupported output format: {image_format}"
+        )
 
     result_path = (
         STORAGE_DIR
         / f"{token}{extension}"
     )
 
-    result_path.write_bytes(
-        clean_bytes
-    )
+    try:
+        result_path.write_bytes(
+            clean_bytes
+        )
+    except OSError as exc:
+        raise RuntimeError(
+            f"Could not save processed image: {exc}"
+        ) from exc
 
     # --------------------------------------------------------
     # DOWNLOAD URL
@@ -235,7 +281,7 @@ async def remove_image_metadata(
 
 
 # ============================================================
-# MCP HTTP APP
+# MCP HTTP APPLICATION
 # ============================================================
 
 mcp_http_app = mcp.streamable_http_app(
@@ -246,7 +292,6 @@ mcp_http_app = mcp.streamable_http_app(
         enable_dns_rebinding_protection=True,
         allowed_hosts=[
             "metadata-remover-ompw.onrender.com",
-            "metadata-remover-ompw.onrender.com:*",
         ],
         allowed_origins=[
             "https://chatgpt.com",
@@ -261,24 +306,34 @@ mcp_http_app = mcp.streamable_http_app(
 # ============================================================
 
 @contextlib.asynccontextmanager
-async def lifespan(app):
+async def lifespan(app: FastAPI):
+    """
+    Starts and stops the MCP session manager correctly.
+    """
+
     async with mcp.session_manager.run():
         yield
 
 
 # ============================================================
-# WEB APP
+# FASTAPI APP
 # ============================================================
 
 app = FastAPI(
     title="Image Privacy Protector MCP",
     version="1.0.0",
+    description=(
+        "MCP server for removing embedded metadata "
+        "from uploaded images."
+    ),
     lifespan=lifespan,
 )
 
 
-# MCP endpoint:
-# https://metadata-remover-ompw.onrender.com/mcp
+# ============================================================
+# MCP ENDPOINT
+# ============================================================
+
 app.mount(
     "/mcp",
     mcp_http_app,
@@ -314,12 +369,12 @@ async def root():
 @app.get("/privacy")
 async def privacy():
     return {
-        "privacy_policy": "Image Privacy Protector",
-        "message": (
+        "service": "Image Privacy Protector",
+        "privacy": (
             "Uploaded images are processed temporarily "
             "for the purpose of removing embedded metadata. "
-            "Processed files are temporary and automatically "
-            "removed after a limited period."
+            "Processed files are automatically removed "
+            "after a limited period."
         ),
     }
 
@@ -329,7 +384,14 @@ async def privacy():
 # ============================================================
 
 @app.get("/download/{token}")
-async def download_result(token: str):
+async def download_result(
+    token: str,
+):
+    """
+    Returns a processed image.
+
+    Files are temporary and are cleaned automatically.
+    """
 
     cleanup_old_files()
 
