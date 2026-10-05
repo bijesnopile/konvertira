@@ -3,3 +3,15 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+node_modules/
+dist/
+.vite/
+*.local
+npm-debug.log*
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+backups/

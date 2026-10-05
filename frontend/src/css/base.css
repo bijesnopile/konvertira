@@ -1,0 +1,14 @@
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { @apply m-0 bg-sand font-sans text-ink antialiased; }
+  ::selection { @apply bg-forest-200 text-forest-900; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

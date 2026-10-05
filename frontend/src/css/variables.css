@@ -1,0 +1,16 @@
+@theme {
+  --color-ink: #17211b;
+  --color-sand: #f7f6f1;
+  --color-forest-50: #f2f8f4;
+  --color-forest-100: #e2f0e6;
+  --color-forest-200: #c5e1cc;
+  --color-forest-300: #9bc9a8;
+  --color-forest-400: #6cab7d;
+  --color-forest-500: #478e5c;
+  --color-forest-600: #357248;
+  --color-forest-700: #2c5b3b;
+  --color-forest-800: #274a33;
+  --color-forest-900: #213d2b;
+  --shadow-card: 0 20px 60px -30px rgba(23, 33, 27, 0.24);
+  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
+}

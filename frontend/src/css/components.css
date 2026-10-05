@@ -1,0 +1,21 @@
+@layer components {
+  .button-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-forest-800 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-forest-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .button-secondary {
+    @apply inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-ink shadow-sm transition-colors hover:border-forest-400 hover:text-forest-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-500 focus-visible:ring-offset-2;
+  }
+  .nav-link {
+    @apply rounded-lg text-sm font-medium text-slate-600 transition-colors hover:text-forest-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-500 focus-visible:ring-offset-4;
+  }
+  .footer-link {
+    @apply rounded text-white/65 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white;
+  }
+  .eyebrow { @apply text-xs font-bold uppercase tracking-[0.18em] text-forest-700; }
+}
+
+.hero-grid {
+  background-image: linear-gradient(rgba(39, 74, 51, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(39, 74, 51, 0.07) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 88%);
+}

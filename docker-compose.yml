@@ -1,0 +1,68 @@
+name: konvertira
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - internal
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file:
+      - .env
+    environment:
+      STORAGE_DIR: /tmp/konvertira-results
+    expose:
+      - "8000"
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - backend_results:/tmp/konvertira-results
+    restart: unless-stopped
+    networks:
+      - internal
+
+  mcp:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: ["uvicorn", "mcp_server:app", "--host", "0.0.0.0", "--port", "8001"]
+    env_file:
+      - .env
+    environment:
+      MCP_STORAGE_DIR: /tmp/konvertira-mcp-results
+      MCP_PORT: "8001"
+    expose:
+      - "8001"
+    ports:
+      - "127.0.0.1:${MCP_PORT:-8001}:8001"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=2)"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    volumes:
+      - mcp_results:/tmp/konvertira-mcp-results
+    restart: unless-stopped
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  backend_results:
+  mcp_results:
