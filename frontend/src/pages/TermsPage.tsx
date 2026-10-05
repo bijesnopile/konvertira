@@ -17,7 +17,6 @@ export function TermsPage() {
         <p>You are responsible for having the right to process each file and for keeping appropriate backups. You must not use Konvertira for unlawful content, rights violations, malware distribution, interference with the service, or attempts to bypass service limits and security controls.</p>
         <h2>4. Output and availability</h2>
         <p>Browser and server conversions may change compression, metadata, color profiles, formatting, or other file properties. Results may not be complete or suitable for every purpose. Check downloaded files before relying on them or deleting the originals.</p>
-        <p>The service is provided on an “as available” basis, subject to warranties that cannot legally be excluded.</p>
         <h2>5. Liability</h2>
         <p>To the fullest extent permitted by applicable law, Konvertira is provided on an “as available” basis without guarantees of uninterrupted or error-free operation.</p>
         <p>Konvertira is not liable for indirect, incidental, special, consequential, or similar losses arising from the use of the service, including loss of data, loss of files, conversion errors, metadata changes, or reliance on processed output.</p>
@@ -30,8 +29,7 @@ export function TermsPage() {
         <h2>7. Changes and contact</h2>
         <p>These terms may be updated as the service changes.</p>
         <p>Effective date: October 5, 2026.</p>
-        <p>For questions about these terms or legal matters, contact:</p>
-        <p><a href="mailto:legal@konvertira.com">legal@konvertira.com</a></p>
+        <p>For questions about these terms or legal matters, contact: <a href="mailto:legal@konvertira.com">legal@konvertira.com</a>.</p>
         <p>Konvertira is an independently operated project based in Croatia.</p>
       </article>
     </>
