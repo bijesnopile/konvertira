@@ -19,8 +19,9 @@ export function TermsPage() {
         <p>Browser and server conversions may change compression, metadata, color profiles, formatting, or other file properties. Results may not be complete or suitable for every purpose. Check downloaded files before relying on them or deleting the originals.</p>
         <p>The service is provided on an “as available” basis, subject to warranties that cannot legally be excluded.</p>
         <h2>5. Liability</h2>
-        <p>To the fullest extent permitted by applicable law, Konvertira is provided without guarantees of uninterrupted or error-free operation. Konvertira is not liable for indirect, incidental, special, consequential, or similar losses arising from the use of the service, including loss of data, loss of files, or loss resulting from conversion errors.</p>
-        <p>You are responsible for keeping backups of important files and verifying processed output before relying on it.</p>
+        <p>To the fullest extent permitted by applicable law, Konvertira is provided on an “as available” basis without guarantees of uninterrupted or error-free operation.</p>
+        <p>Konvertira is not liable for indirect, incidental, special, consequential, or similar losses arising from the use of the service, including loss of data, loss of files, conversion errors, metadata changes, or reliance on processed output.</p>
+        <p>You are responsible for keeping appropriate backups and verifying processed files before relying on them or deleting the originals.</p>
         <p>Nothing in these terms excludes or limits liability where such exclusion or limitation is prohibited by applicable law, including any mandatory consumer rights.</p>
         <h2>6. Governing terms</h2>
         <p>These terms are governed by the laws of the Republic of Croatia.</p>
@@ -29,7 +30,8 @@ export function TermsPage() {
         <h2>7. Changes and contact</h2>
         <p>These terms may be updated as the service changes.</p>
         <p>Effective date: October 5, 2026.</p>
-        <p>For questions about these terms, contact: <a href="mailto:legal@konvertira.com">legal@konvertira.com</a>.</p>
+        <p>For questions about these terms or legal matters, contact:</p>
+        <p><a href="mailto:legal@konvertira.com">legal@konvertira.com</a></p>
         <p>Konvertira is an independently operated project based in Croatia.</p>
       </article>
     </>
