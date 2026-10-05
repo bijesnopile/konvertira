@@ -2,6 +2,7 @@ import io
 
 import pytest
 from PIL import Image
+from PIL.PngImagePlugin import PngImageFile
 
 from backend.models.files import FileProcessingError
 from backend.processors.image import convert_image, remove_image_metadata
@@ -36,6 +37,16 @@ def test_max_file_size_validation() -> None:
 
 
 def test_max_resolution_validation() -> None:
+    with pytest.raises(FileProcessingError) as error:
+        remove_image_metadata(make_image("PNG"), max_pixels=5)
+    assert error.value.status_code == 413
+
+
+def test_max_resolution_is_checked_before_pixel_decode(monkeypatch) -> None:
+    def fail_if_loaded(_: PngImageFile):
+        pytest.fail("pixel data was decoded before the dimension limit")
+
+    monkeypatch.setattr(PngImageFile, "load", fail_if_loaded)
     with pytest.raises(FileProcessingError) as error:
         remove_image_metadata(make_image("PNG"), max_pixels=5)
     assert error.value.status_code == 413

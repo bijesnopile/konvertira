@@ -78,4 +78,5 @@ async def download_openai_file(
     except DownloadError:
         raise
     except (httpx.HTTPError, ValueError) as exc:
-        raise DownloadError(f"Could not download uploaded file: {exc}", 502) from exc
+        # Do not echo signed download URLs or lower-level network details to clients.
+        raise DownloadError("Could not download the uploaded file.", 502) from exc

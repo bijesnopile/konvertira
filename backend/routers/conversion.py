@@ -1,11 +1,13 @@
 """Image conversion routes."""
 
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+import asyncio
+
+from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import Response
 
 from backend.models.files import FileProcessingError
 from backend.processors.image import convert_image
-from backend.services.security import read_upload_limited
+from backend.services.security import heavy_request_guard, read_upload_limited
 from backend.utils.filenames import converted_output_filename
 from backend.utils.mime import ALLOWED_IMAGE_MIME_TYPES, get_content_type
 
@@ -14,6 +16,7 @@ router = APIRouter()
 
 @router.post("/images/convert")
 async def convert_image_upload(
+    request: Request,
     file: UploadFile = File(...),
     format: str = Form(...),
     quality: int = Form(90),
@@ -21,9 +24,15 @@ async def convert_image_upload(
     if file.content_type and file.content_type not in ALLOWED_IMAGE_MIME_TYPES:
         raise HTTPException(status_code=415, detail="Supported formats are JPEG, PNG and WEBP.")
 
-    image_bytes = await read_upload_limited(file)
     try:
-        processed = convert_image(image_bytes, format, quality=quality)
+        async with heavy_request_guard(request):
+            image_bytes = await read_upload_limited(file)
+            processed = await asyncio.to_thread(
+                convert_image,
+                image_bytes,
+                format,
+                quality=quality,
+            )
     except FileProcessingError as exc:
         raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
 

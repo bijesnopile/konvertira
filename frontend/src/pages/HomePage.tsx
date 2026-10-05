@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
+import { ProcessingModeBadge, ProcessingModeInfo } from '../components/ProcessingMode'
 import { ToolCard } from '../components/ToolCard'
 
 const features = [
   {
     title: 'Remove metadata',
-    description: 'Strip GPS, camera details, capture dates, and other embedded image data.',
+    description: 'Create a new image without intentionally copying EXIF, GPS, or camera data.',
     icon: <><path d="M12 3 5 6v5c0 4.6 2.8 8.5 7 10 4.2-1.5 7-5.4 7-10V6l-7-3Z" /><path d="m9 12 2 2 4-4" /></>,
   },
   {
@@ -14,7 +15,7 @@ const features = [
   },
   {
     title: 'Privacy-focused processing',
-    description: 'Files are processed only to perform the operation you request.',
+    description: 'Supported image operations run locally in your browser without an upload.',
     icon: <><rect x="5" y="10" width="14" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></>,
   },
   {
@@ -32,22 +33,19 @@ export function HomePage() {
       <section className="relative overflow-hidden px-5 pb-16 pt-20 text-center sm:px-8 sm:pb-20 sm:pt-28 lg:px-10">
         <div className="hero-grid absolute inset-0 opacity-50" aria-hidden="true" />
         <div className="relative mx-auto max-w-4xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-forest-200 bg-white px-3.5 py-2 text-xs font-semibold text-forest-800 shadow-sm">
-            <span className="h-2 w-2 rounded-full bg-forest-500" />
-            Private by design. Simple by default.
-          </div>
+          <div className="mb-6"><ProcessingModeBadge mode="local" label="Image tools process locally" /></div>
           <h1 className="text-balance text-4xl font-semibold tracking-[-0.04em] text-ink sm:text-6xl lg:text-7xl">
             Convert files. Remove metadata. <span className="text-forest-700">Keep control.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
-            Konvertira helps you convert files and remove sensitive metadata such as GPS, EXIF, camera information and other embedded data.
+            Convert JPG, PNG, and WEBP images or remove common embedded metadata directly in your browser—without uploading the image to Konvertira.
           </p>
           <div className="mt-9 flex flex-col items-center gap-3">
             <Link to="/#tools" className="button-primary px-7 py-3.5 text-base">
               Choose a file
               <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></svg>
             </Link>
-            <span className="text-sm text-slate-500">No account required</span>
+            <span className="text-sm text-slate-500">No account required · No image upload</span>
           </div>
         </div>
       </section>
@@ -57,18 +55,38 @@ export function HomePage() {
       <section id="privacy" className="bg-forest-900 px-5 py-20 text-white sm:px-8 sm:py-28 lg:px-10">
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-20">
           <div>
-            <p className="eyebrow text-forest-300">Your data, respected</p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-5xl">Privacy comes first</h2>
-            <p className="mt-5 max-w-xl text-base leading-7 text-white/65 sm:text-lg">A practical file tool should do its job without turning your files into a product. Our processing is designed around that principle.</p>
+            <p className="eyebrow text-forest-300">Clear by default</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-5xl">Privacy by design</h2>
+            <p className="mt-5 max-w-xl text-base leading-7 text-white/70 sm:text-lg">For supported image tools, your browser does the work and the image does not need to reach our server. If a future tool requires an upload, Konvertira will tell you before it happens.</p>
             <Link to="/privacy" className="mt-7 inline-flex items-center gap-2 rounded-lg text-sm font-semibold text-white underline decoration-white/30 underline-offset-4 hover:decoration-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-forest-900">
               Read our privacy policy <span aria-hidden="true">→</span>
             </Link>
           </div>
-          <div className="grid gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-2">
-            <PrivacyPoint number="01" text="Files are processed only for the operation you request." />
-            <PrivacyPoint number="02" text="Processed files are temporary and scheduled for deletion." />
-            <PrivacyPoint number="03" text="Remove GPS location and camera information from images." />
-            <PrivacyPoint number="04" text="Clean capture dates and embedded application metadata." />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <ProcessingModeInfo
+              mode="local"
+              title="Images"
+              description="JPG, PNG, and WEBP conversion and metadata removal run on your device."
+              className="h-full"
+            >
+              <ul className="mt-5 space-y-2 text-sm text-slate-600">
+                <ModeItem>Conversion in your browser</ModeItem>
+                <ModeItem>Metadata-clean re-encoding</ModeItem>
+                <ModeItem>No upload required</ModeItem>
+              </ul>
+            </ProcessingModeInfo>
+            <ProcessingModeInfo
+              mode="server"
+              title="Some document tools"
+              description="PDFs, Office files, unsupported formats, and MCP workflows may need server infrastructure."
+              className="h-full"
+            >
+              <ul className="mt-5 space-y-2 text-sm text-slate-600">
+                <ModeItem>Clearly indicated before upload</ModeItem>
+                <ModeItem>Used only for the requested task</ModeItem>
+                <ModeItem>Temporary processing</ModeItem>
+              </ul>
+            </ProcessingModeInfo>
           </div>
         </div>
       </section>
@@ -99,6 +117,7 @@ export function HomePage() {
             <div><p className="eyebrow">What’s next</p><h2 id="coming-soon-heading" className="mt-4 text-3xl font-semibold tracking-tight text-ink sm:text-5xl">More useful tools are on the way</h2></div>
             <span className="w-fit rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-amber-800">Coming soon</span>
           </div>
+          <p className="mt-5 max-w-2xl text-sm leading-6 text-slate-600">These tools are not active yet. If one requires server processing, it will be clearly labeled before a file is uploaded.</p>
           <ul className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {upcoming.map((item) => (
               <li key={item} className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50/70 px-5 py-4 text-sm font-semibold text-slate-600" aria-disabled="true">
@@ -113,6 +132,6 @@ export function HomePage() {
   )
 }
 
-function PrivacyPoint({ number, text }: { number: string; text: string }) {
-  return <div className="bg-forest-900 p-6 sm:p-7"><span className="text-xs font-semibold tracking-widest text-forest-300">{number}</span><p className="mt-3 text-sm leading-6 text-white/80">{text}</p></div>
+function ModeItem({ children }: { children: string }) {
+  return <li className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-forest-500" aria-hidden="true" /><span>{children}</span></li>
 }

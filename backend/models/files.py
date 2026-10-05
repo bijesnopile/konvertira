@@ -26,3 +26,17 @@ class FileProcessingError(ValueError):
 
 class StorageError(RuntimeError):
     """Temporary result storage could not complete an operation."""
+
+    def __init__(self, message: str, status_code: int = 500) -> None:
+        super().__init__(message)
+        self.status_code = status_code
+
+
+class StorageCapacityError(StorageError):
+    """Temporary storage is full enough that new results must be rejected."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            "Temporary result storage is currently full. Please try again later.",
+            status_code=503,
+        )

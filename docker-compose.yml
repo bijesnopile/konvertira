@@ -11,6 +11,9 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+    init: true
+    security_opt:
+      - no-new-privileges:true
     restart: unless-stopped
     networks:
       - internal
@@ -29,6 +32,11 @@ services:
       - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
     volumes:
       - backend_results:/tmp/konvertira-results
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     restart: unless-stopped
     networks:
       - internal
@@ -37,7 +45,7 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    command: ["uvicorn", "mcp_server:app", "--host", "0.0.0.0", "--port", "8001"]
+    command: ["uvicorn", "mcp_server:app", "--host", "0.0.0.0", "--port", "8001", "--no-access-log"]
     env_file:
       - .env
     environment:
@@ -55,6 +63,11 @@ services:
       retries: 3
     volumes:
       - mcp_results:/tmp/konvertira-mcp-results
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     restart: unless-stopped
     networks:
       - internal

@@ -1,38 +1,71 @@
 import { PageIntro } from '../components/PageIntro'
+import { ProcessingModeInfo } from '../components/ProcessingMode'
 
 export function PrivacyPage() {
   return (
     <>
-      <PageIntro eyebrow="Privacy policy" title="Your files deserve careful handling.">
-        This policy explains how Konvertira handles files and related information when you use our service.
+      <PageIntro eyebrow="Privacy" title="A local-first approach to your files.">
+        Clear information about what stays in your browser, what may use a server, and why.
       </PageIntro>
+
       <article className="legal-content">
-        <p className="legal-note"><strong>Draft notice:</strong> This policy is a practical starting point and should be reviewed by qualified legal counsel before public launch. Replace bracketed placeholders with final details.</p>
+        <p className="text-sm text-slate-500">Last updated: October 5, 2026</p>
 
-        <h2>1. Information we process</h2>
-        <p>When you submit a file, we process the file itself, its filename, selected operation, technical request details, and basic server logs needed to operate and protect the service. We do not require an account for the current version.</p>
+        <h2>1. Privacy philosophy</h2>
+        <p>Konvertira is a small independent side project built by a student and solo developer around a simple idea: basic file conversion should be useful, accessible, and respectful of your privacy. It should not require an unnecessary subscription or account.</p>
+        <p>Whenever an operation can work reliably in the browser, Konvertira prefers local processing. Some tools need server infrastructure, so the interface is designed to distinguish those workflows clearly.</p>
 
-        <h2>2. How files are handled</h2>
-        <p>Files may be uploaded to and temporarily processed on Konvertira’s servers or infrastructure operated on our behalf. We use each submitted file to perform the operation you requested, such as removing image metadata or converting an image format.</p>
-        <p>Uploaded and processed files are scheduled for automatic deletion after <strong>[INSERT RETENTION PERIOD]</strong>. Temporary copies, caches, or backups may follow a separate deletion schedule of <strong>[INSERT APPLICABLE PERIOD]</strong>. These placeholders must be updated to match the production system before launch.</p>
+        <div className="my-10 grid gap-4 sm:grid-cols-2">
+          <ProcessingModeInfo
+            mode="local"
+            title="Supported image tools"
+            description="JPG, PNG, and static WEBP conversion and metadata removal run directly in your browser."
+          />
+          <ProcessingModeInfo
+            mode="server"
+            title="Some other tools"
+            description="Documents, unsupported formats, and MCP workflows may require a clearly indicated temporary upload."
+          />
+        </div>
 
-        <h2>3. Metadata</h2>
-        <p>Image metadata can include GPS location, camera and device information, capture dates, editing software, and other embedded fields. The amount and type of metadata removed may depend on the file format and processing method. You should verify the output if you have a specific privacy requirement.</p>
+        <h2>2. Images processed in your browser</h2>
+        <p>For supported JPG, PNG, and WEBP image tools, your browser does the work. The selected image is not sent to Konvertira or to the Konvertira API.</p>
+        <p>Your browser decodes the image, renders its visible pixels to a temporary canvas, and creates a new image file locally. The result is generated and downloaded on your device. Server infrastructure is not involved in this workflow.</p>
 
-        <h2>4. Why we process information</h2>
-        <p>We process files and limited technical data to provide the requested service, maintain reliability, prevent abuse, diagnose errors, and meet applicable legal obligations. We do not use uploaded file contents for advertising.</p>
+        <h2>3. Metadata removal</h2>
+        <p>Images may contain GPS or location data, EXIF fields, camera information, capture dates, software information, embedded comments, and related details.</p>
+        <p>Konvertira’s local cleaning process is designed to remove common embedded image metadata by creating a new image from decoded pixels instead of copying the original file container. Original metadata is not intentionally carried into the result.</p>
+        <p>This is not a guarantee that every conceivable privacy artifact is removed. Browser re-encoding can also change compression, color profiles, animation, and other format-specific properties. Animated WEBP images are currently rejected by the local tool.</p>
 
-        <h2>5. Service providers and disclosures</h2>
-        <p>We may use hosting, storage, security, and infrastructure providers to operate Konvertira. Those providers may process data on our behalf under their applicable terms. We may also disclose information when required by law or when reasonably necessary to protect the service, users, or others.</p>
+        <h2>4. When a file may need to be uploaded</h2>
+        <p>Some operations cannot reasonably or reliably run entirely in a browser. Future PDF tools, Office or document conversion, unsupported formats, and MCP or ChatGPT workflows may require server processing.</p>
+        <p>When server processing is required, the interface should identify it before upload. The file may then be sent to Konvertira infrastructure and processed only for the requested operation. Temporary files may exist while processing and download are required.</p>
+        <p>Konvertira does not silently upload an image when local processing fails. The current image tool shows an error and keeps the file on your device.</p>
 
-        <h2>6. Security</h2>
-        <p>We use reasonable technical and organizational measures appropriate to the service. No internet service can guarantee absolute security, so avoid uploading files that you do not want processed through a server-based service.</p>
+        <h2>5. Temporary storage</h2>
+        <p>Files processed on the server may be stored temporarily so the requested operation can be completed and the result downloaded. Temporary processed files are currently configured to be removed after approximately 15 minutes.</p>
+        <p>This describes Konvertira’s configured application storage. It does not claim immediate deletion from every cache, backup, or underlying infrastructure system.</p>
 
-        <h2>7. Your choices and rights</h2>
-        <p>Depending on where you live, you may have rights concerning personal data, including access, correction, deletion, or objection. Contact us at <a href="mailto:privacy@konvertira.com">privacy@konvertira.com</a>. We may need information to verify and respond to a request.</p>
+        <h2>6. Accounts and necessary data</h2>
+        <p>The basic website image tools do not require an account. Because those image operations are local, Konvertira does not need to receive the image contents.</p>
+        <p>For server-backed features, limited technical request information and operational logs may be handled as reasonably necessary to deliver, protect, and troubleshoot the service.</p>
 
-        <h2>8. Changes and contact</h2>
-        <p>We may update this policy as the service changes. The effective date will be shown here: <strong>[INSERT EFFECTIVE DATE]</strong>. Questions can be sent to <a href="mailto:privacy@konvertira.com">privacy@konvertira.com</a> or <strong>[INSERT LEGAL ENTITY AND ADDRESS]</strong>.</p>
+        <h2>7. An independent project with practical limits</h2>
+        <p>Konvertira is independently operated, so server capacity is limited. File-size limits, processing limits, and format restrictions may apply, especially to server-side tools.</p>
+        <p>Local browser processing reduces infrastructure costs and avoids sending every supported image through a server. The goal is to improve capacity and supported formats over time without making promises about specific release dates.</p>
+
+        <h2>8. Security</h2>
+        <p>HTTPS is used for communication with Konvertira’s web services, and reasonable technical measures are used to operate the service safely. Local image processing reduces the need to transmit supported image files.</p>
+        <p>No online or local software can promise perfect security or zero risk. Konvertira does not claim end-to-end encryption, zero-knowledge processing, or guaranteed anonymization.</p>
+
+        <h2>9. Third-party infrastructure</h2>
+        <p>Konvertira may rely on third-party services for hosting, DNS or content delivery, MCP-related functionality, and other operational infrastructure. When a server-backed feature is used, those providers may handle limited data as necessary to provide their infrastructure.</p>
+
+        <h2>10. Changes to the service</h2>
+        <p>Konvertira is actively developed. Processing methods, supported formats, safety limits, and server behavior may change as the project improves. This page will be updated when important privacy-related behavior changes.</p>
+
+        <h2>11. Contact</h2>
+        <p>Questions about privacy or file handling can be sent to <a href="mailto:privacy@konvertira.com">privacy@konvertira.com</a>.</p>
       </article>
     </>
   )

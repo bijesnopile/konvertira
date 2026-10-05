@@ -2,6 +2,19 @@
 
 Production-oriented React frontend for [konvertira.com](https://konvertira.com), a privacy-first image conversion and metadata cleaning service.
 
+## Local image processing
+
+JPG/JPEG, PNG, and static WEBP conversion and metadata removal run entirely in the browser. These operations do not call the backend API or upload image bytes.
+
+The local workflow is:
+
+1. The browser decodes the selected image with `createImageBitmap` or an image-element fallback.
+2. Decoded pixels are rendered to a temporary canvas.
+3. The canvas creates a new JPG, PNG, or WEBP blob without intentionally copying source metadata.
+4. The browser downloads that blob through a temporary object URL, which is then revoked.
+
+Canvas re-encoding may change compression and ICC/color-profile details. It does not guarantee removal of every conceivable privacy artifact. Animated WEBP is rejected because canvas processing would preserve only one frame. Transparent pixels are filled with white when producing JPEG.
+
 ## Requirements
 
 - Node.js 22 or newer
@@ -29,18 +42,24 @@ Vite prints the local URL when the development server starts (normally `http://l
 | Variable | Required | Description |
 | --- | --- | --- |
 | `VITE_API_BASE_URL` | Yes | Base URL of the Konvertira processing API, without a trailing slash. |
+| `VITE_LOCAL_IMAGE_MAX_SIZE_MB` | No | Browser-processing compressed-file limit; defaults to `50`. |
+| `VITE_LOCAL_IMAGE_MAX_PIXELS` | No | Browser-processing decoded pixel limit; defaults to `40000000`. |
 
 Start from `.env.example`:
 
 ```env
 VITE_API_BASE_URL=https://api.konvertira.com
+VITE_LOCAL_IMAGE_MAX_SIZE_MB=50
+VITE_LOCAL_IMAGE_MAX_PIXELS=40000000
 ```
 
 Vite variables are embedded into the static bundle at build time. Changing this value in production requires rebuilding the frontend. Do not put API secrets in `VITE_*` variables because they are visible to users.
 
 ## API contract
 
-The typed client lives in `src/services/api.ts` and expects these endpoints:
+The typed client in `src/services/api.ts` remains available for future PDFs, office documents, unsupported browser formats, and explicitly selected server workflows. Current JPG, PNG, and WEBP operations use `src/services/localImageProcessor.ts` and do not call these endpoints.
+
+The server client expects these endpoints when used:
 
 - `POST /images/remove-metadata` — `multipart/form-data` with a `file` field.
 - `POST /images/convert` — `multipart/form-data` with `file` and `format` (`jpg`, `png`, or `webp`) fields.
@@ -51,6 +70,7 @@ Successful responses should contain the processed file as the response body. A `
 
 ```bash
 npm run typecheck
+npm test
 npm run build
 npm run preview
 ```

@@ -8,7 +8,7 @@ export function Footer() {
         <div className="flex flex-col justify-between gap-10 border-b border-white/10 pb-10 sm:flex-row sm:items-start">
           <div className="max-w-sm">
             <Logo light />
-            <p className="mt-4 text-sm leading-6 text-white/65">Simple file tools designed with your privacy in mind.</p>
+            <p className="mt-4 text-sm leading-6 text-white/65">Independent file tools with local image processing and clear server-use labels.</p>
           </div>
           <nav className="grid grid-cols-2 gap-x-12 gap-y-3 text-sm sm:grid-cols-3" aria-label="Footer navigation">
             <Link className="footer-link" to="/privacy">Privacy</Link>

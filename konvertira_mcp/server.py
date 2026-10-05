@@ -1,15 +1,19 @@
 """MCP server creation and HTTP transport application."""
 
-from contextlib import asynccontextmanager
+import asyncio
+from contextlib import asynccontextmanager, suppress
 from typing import AsyncIterator
 
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse
 from mcp.server import MCPServer
 from mcp.server.transport_security import TransportSecuritySettings
 from mcp.types import ToolAnnotations
 
 from backend.utils.mime import content_type_for_path
+from backend.services.resource_limits import McpRateLimitError, mcp_resource_limits
+from backend.services.security import enforce_general_rate
+from backend.services.storage import cleanup_periodically
 from config import settings
 from konvertira_mcp.tools.image_metadata import mcp_storage, remove_image_metadata
 
@@ -59,8 +63,14 @@ mcp_http_app = mcp.streamable_http_app(
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     mcp_storage.cleanup()
-    async with mcp.session_manager.run():
-        yield
+    cleanup_task = asyncio.create_task(cleanup_periodically(mcp_storage))
+    try:
+        async with mcp.session_manager.run():
+            yield
+    finally:
+        cleanup_task.cancel()
+        with suppress(asyncio.CancelledError):
+            await cleanup_task
 
 
 def create_app() -> FastAPI:
@@ -70,6 +80,20 @@ def create_app() -> FastAPI:
         description="MCP server for removing embedded metadata from uploaded images.",
         lifespan=lifespan,
     )
+
+    @application.middleware("http")
+    async def protect_mcp_processing(request: Request, call_next):
+        if request.method != "OPTIONS" and request.url.path.startswith("/mcp"):
+            try:
+                mcp_resource_limits.check_request()
+            except McpRateLimitError as exc:
+                return JSONResponse(
+                    status_code=429,
+                    content={"detail": str(exc)},
+                    headers={"Retry-After": str(exc.retry_after)},
+                )
+        return await call_next(request)
+
     application.mount("/mcp", mcp_http_app)
 
     @application.get("/health")
@@ -97,7 +121,8 @@ def create_app() -> FastAPI:
         }
 
     @application.get("/download/{token}")
-    async def download_result(token: str) -> FileResponse:
+    async def download_result(token: str, request: Request) -> FileResponse:
+        enforce_general_rate(request)
         mcp_storage.cleanup()
         file_path = mcp_storage.resolve(token)
         if file_path is None:
@@ -105,7 +130,7 @@ def create_app() -> FastAPI:
         return FileResponse(
             path=file_path,
             media_type=content_type_for_path(file_path.suffix),
-            filename=file_path.name,
+            filename=f"konvertira-cleaned{file_path.suffix}",
             headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"},
         )
 

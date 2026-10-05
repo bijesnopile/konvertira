@@ -1,6 +1,7 @@
 """Konvertira FastAPI application entry point."""
 
-from contextlib import asynccontextmanager
+import asyncio
+from contextlib import asynccontextmanager, suppress
 from typing import AsyncIterator
 
 from fastapi import FastAPI
@@ -10,7 +11,7 @@ from backend.compat import cleanup_old_files, download_openai_file, remove_metad
 from backend.routers import conversion, downloads, health, metadata
 from backend.schemas import ActionRequest, ActionResponse, OpenAIFileRef
 from backend.services.security import api_key_header, verify_api_key
-from backend.services.storage import api_storage
+from backend.services.storage import api_storage, cleanup_periodically
 from backend.utils.filenames import clean_filename
 from backend.utils.mime import (
     ALLOWED_IMAGE_FORMATS as ALLOWED_FORMATS,
@@ -33,7 +34,13 @@ ALLOWED_DOWNLOAD_HOST = "files.oaiusercontent.com"
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     api_storage.cleanup()
-    yield
+    cleanup_task = asyncio.create_task(cleanup_periodically(api_storage))
+    try:
+        yield
+    finally:
+        cleanup_task.cancel()
+        with suppress(asyncio.CancelledError):
+            await cleanup_task
 
 
 def create_app() -> FastAPI:

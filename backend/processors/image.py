@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import warnings
 from typing import Any
 
 from PIL import Image, UnidentifiedImageError
@@ -16,31 +17,44 @@ from config import settings
 def _open_image(image_bytes: bytes, max_image_size: int, max_pixels: int) -> Image.Image:
     validate_file_size(image_bytes, max_image_size)
 
+    source: Image.Image | None = None
     try:
-        source = Image.open(io.BytesIO(image_bytes))
+        # Pillow may warn at a library-level threshold. Konvertira applies its
+        # own configurable limit before decoding pixel buffers.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", Image.DecompressionBombWarning)
+            source = Image.open(io.BytesIO(image_bytes))
+
+        image_format = (source.format or "").upper()
+        if image_format not in ALLOWED_IMAGE_FORMATS:
+            raise FileProcessingError(
+                "Supported formats are JPEG, PNG and WEBP.", status_code=415
+            )
+
+        width, height = source.size
+        if width <= 0 or height <= 0:
+            raise FileProcessingError("The image has invalid dimensions.")
+        if width * height > max_pixels:
+            raise FileProcessingError(
+                f"The image resolution exceeds the {max_pixels:,} pixel limit.",
+                status_code=413,
+            )
+
+        # Decode only after the inexpensive header-based format and dimension
+        # checks, preventing compressed image bombs from allocating first.
         source.load()
+    except FileProcessingError:
+        if source is not None:
+            source.close()
+        raise
     except UnidentifiedImageError as exc:
+        if source is not None:
+            source.close()
         raise FileProcessingError("The file is not a valid image.") from exc
     except (OSError, Image.DecompressionBombError) as exc:
+        if source is not None:
+            source.close()
         raise FileProcessingError("The image is damaged or cannot be read.") from exc
-
-    image_format = (source.format or "").upper()
-    if image_format not in ALLOWED_IMAGE_FORMATS:
-        source.close()
-        raise FileProcessingError(
-            "Supported formats are JPEG, PNG and WEBP.", status_code=415
-        )
-
-    width, height = source.size
-    if width <= 0 or height <= 0:
-        source.close()
-        raise FileProcessingError("The image has invalid dimensions.")
-    if width * height > max_pixels:
-        source.close()
-        raise FileProcessingError(
-            f"The image resolution exceeds the {max_pixels:,} pixel limit.",
-            status_code=413,
-        )
 
     return source
 

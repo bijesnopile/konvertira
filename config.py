@@ -22,6 +22,13 @@ def _path(name: str, default: Path) -> Path:
     return Path(os.getenv(name, str(default))).expanduser().resolve()
 
 
+def _bool(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _mcp_hosts() -> tuple[str, ...]:
     configured = _csv("MCP_ALLOWED_HOSTS", "")
     if configured:
@@ -57,8 +64,47 @@ class Settings:
         default_factory=lambda: int(os.getenv("MAX_IMAGE_SIZE", str(20 * 1024 * 1024)))
     )
     max_pixels: int = field(default_factory=lambda: int(os.getenv("MAX_PIXELS", "100000000")))
+    max_temp_storage_bytes: int = field(
+        default_factory=lambda: int(os.getenv("MAX_TEMP_STORAGE_BYTES", str(1024 * 1024 * 1024)))
+    )
     result_ttl_seconds: int = field(
         default_factory=lambda: int(os.getenv("RESULT_TTL_SECONDS", str(15 * 60)))
+    )
+    rate_limit_enabled: bool = field(
+        default_factory=lambda: _bool("RATE_LIMIT_ENABLED", True)
+    )
+    rate_limit_requests_per_minute: int = field(
+        default_factory=lambda: int(os.getenv("RATE_LIMIT_REQUESTS_PER_MINUTE", "30"))
+    )
+    rate_limit_heavy_jobs_per_minute: int = field(
+        default_factory=lambda: int(os.getenv("RATE_LIMIT_HEAVY_JOBS_PER_MINUTE", "5"))
+    )
+    max_concurrent_heavy_jobs_per_ip: int = field(
+        default_factory=lambda: int(os.getenv("MAX_CONCURRENT_HEAVY_JOBS_PER_IP", "2"))
+    )
+    max_concurrent_heavy_jobs_global: int = field(
+        default_factory=lambda: int(os.getenv("MAX_CONCURRENT_HEAVY_JOBS_GLOBAL", "4"))
+    )
+    trusted_proxy_ips: tuple[str, ...] = field(
+        default_factory=lambda: _csv("TRUSTED_PROXY_IPS", "127.0.0.1/32,::1/128")
+    )
+    mcp_rate_limit_enabled: bool = field(
+        default_factory=lambda: _bool("MCP_RATE_LIMIT_ENABLED", True)
+    )
+    mcp_rate_limit_per_minute: int = field(
+        default_factory=lambda: int(os.getenv("MCP_RATE_LIMIT_PER_MINUTE", "30"))
+    )
+    mcp_heavy_jobs_per_minute: int = field(
+        default_factory=lambda: int(os.getenv("MCP_HEAVY_JOBS_PER_MINUTE", "10"))
+    )
+    mcp_max_global_jobs: int = field(
+        default_factory=lambda: int(os.getenv("MCP_MAX_GLOBAL_JOBS", "4"))
+    )
+    mcp_job_timeout_seconds: float = field(
+        default_factory=lambda: float(os.getenv("MCP_JOB_TIMEOUT_SECONDS", "60"))
+    )
+    mcp_max_temp_storage_mb: int = field(
+        default_factory=lambda: int(os.getenv("MCP_MAX_TEMP_STORAGE_MB", "512"))
     )
     storage_dir: Path = field(
         default_factory=lambda: _path(
@@ -89,6 +135,10 @@ class Settings:
             "MCP_ALLOWED_ORIGINS", "https://chatgpt.com,https://www.chatgpt.com"
         )
     )
+
+    @property
+    def mcp_max_temp_storage_bytes(self) -> int:
+        return self.mcp_max_temp_storage_mb * 1024 * 1024
 
 
 @lru_cache(maxsize=1)
