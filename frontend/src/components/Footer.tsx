@@ -13,9 +13,9 @@ export function Footer() {
           <nav className="grid grid-cols-2 gap-x-12 gap-y-3 text-sm sm:grid-cols-3" aria-label="Footer navigation">
             <Link className="footer-link" to="/privacy">Privacy</Link>
             <Link className="footer-link" to="/terms">Terms</Link>
+            <Link className="footer-link" to="/support">Support</Link>
             <Link className="footer-link" to="/about">About</Link>
-            <a className="footer-link" href="https://github.com/" target="_blank" rel="noreferrer">GitHub</a>
-            <a className="footer-link" href="mailto:hello@konvertira.com">Contact</a>
+            <a className="footer-link" href="https://github.com/bijesnopile/konvertira" target="_blank" rel="noopener noreferrer">GitHub</a>
           </nav>
         </div>
         <div className="flex flex-col gap-2 pt-7 text-sm text-white/50 sm:flex-row sm:items-center sm:justify-between">

@@ -38,8 +38,8 @@ export function PrivacyPage() {
         <p>This is not a guarantee that every conceivable privacy artifact is removed. Browser re-encoding can also change compression, color profiles, animation, and other format-specific properties. Animated WEBP images are currently rejected by the local tool.</p>
 
         <h2>4. When a file may need to be uploaded</h2>
-        <p>Some operations cannot reasonably or reliably run entirely in a browser. Future PDF tools, Office or document conversion, unsupported formats, and MCP or ChatGPT workflows may require server processing.</p>
-        <p>When server processing is required, the interface should identify it before upload. The file may then be sent to Konvertira infrastructure and processed only for the requested operation. Temporary files may exist while processing and download are required.</p>
+        <p>Some operations cannot reasonably or reliably run entirely in a browser. PDF tools, Office or document conversion, unsupported formats, and MCP or ChatGPT workflows may require server processing.</p>
+        <p>When you explicitly use a server-backed tool, including Konvertira through ChatGPT, the file may be transferred to or retrieved by Konvertira's server for temporary processing. The file is processed only for the requested operation, and temporary files may exist while processing and download are required.</p>
         <p>Konvertira does not silently upload an image when local processing fails. The current image tool shows an error and keeps the file on your device.</p>
 
         <h2>5. Temporary storage</h2>
@@ -65,7 +65,7 @@ export function PrivacyPage() {
         <p>Konvertira is actively developed. Processing methods, supported formats, safety limits, and server behavior may change as the project improves. This page will be updated when important privacy-related behavior changes.</p>
 
         <h2>11. Contact</h2>
-        <p>Questions about privacy or file handling can be sent to <a href="mailto:privacy@konvertira.com">privacy@konvertira.com</a>.</p>
+        <p>Questions about privacy or file handling can be sent to <a href="mailto:legal@konvertira.com">legal@konvertira.com</a>.</p>
       </article>
     </>
   )

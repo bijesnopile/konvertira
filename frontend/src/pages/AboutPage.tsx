@@ -44,9 +44,12 @@ export function AboutPage() {
           </div>
 
           <div className="mt-16 border-t border-black/10 pt-10 text-center">
-            <h2 className="text-2xl font-semibold text-ink">Try the local image tools</h2>
-            <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-slate-600">Your supported image stays on your device from selection to download.</p>
-            <Link to="/#tools" className="button-primary mt-6">Choose an image</Link>
+            <h2 className="text-2xl font-semibold text-ink">Explore or contribute</h2>
+            <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-slate-600">Try the local image tools, or visit the public repository to follow development and report technical issues.</p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Link to="/#tools" className="button-primary">Choose an image</Link>
+              <a href="https://github.com/bijesnopile/konvertira" target="_blank" rel="noopener noreferrer" className="button-secondary">View on GitHub</a>
+            </div>
           </div>
         </div>
       </section>

@@ -98,6 +98,6 @@ Open `http://localhost:8080`. The container exposes port 80 and serves the app w
 - Configure HTTPS at the load balancer, reverse proxy, or hosting platform.
 - Pass the correct `VITE_API_BASE_URL` during every environment-specific image build.
 - Configure the API's CORS allowlist for the deployed frontend origin.
-- Replace retention-period, legal-entity, jurisdiction, and effective-date placeholders on the Privacy and Terms pages before public launch.
-- Update the footer GitHub URL when the public repository URL is known.
+- Review the Privacy and Terms pages when processing behavior or applicable legal requirements change.
+- Keep public repository links pointed to `https://github.com/bijesnopile/konvertira`.
 - The frontend does not include authentication, payments, analytics, or backend processing logic.
