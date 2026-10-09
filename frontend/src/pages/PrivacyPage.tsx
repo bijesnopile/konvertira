@@ -9,7 +9,7 @@ export function PrivacyPage() {
       </PageIntro>
 
       <article className="legal-content">
-        <p className="text-sm text-slate-500">Last updated: October 5, 2026</p>
+        <p className="text-sm text-slate-500">Last updated: October 9, 2026</p>
 
         <h2>1. Privacy philosophy</h2>
         <p>Konvertira is a small independent side project built by a student and solo developer around a simple idea: basic file conversion should be useful, accessible, and respectful of your privacy. It should not require an unnecessary subscription or account.</p>
@@ -24,7 +24,7 @@ export function PrivacyPage() {
           <ProcessingModeInfo
             mode="server"
             title="Some other tools"
-            description="Documents, unsupported formats, and MCP workflows may require a clearly indicated temporary upload."
+            description="PDF, document, Office, advanced image-codec, and MCP workflows require a clearly indicated temporary upload."
           />
         </div>
 
@@ -39,11 +39,11 @@ export function PrivacyPage() {
 
         <h2>4. When a file may need to be uploaded</h2>
         <p>Some operations cannot reasonably or reliably run entirely in a browser. PDF tools, Office or document conversion, unsupported formats, and MCP or ChatGPT workflows may require server processing.</p>
-        <p>When you explicitly use a server-backed tool, including Konvertira through ChatGPT, the file may be transferred to or retrieved by Konvertira's server for temporary processing. The file is processed only for the requested operation, and temporary files may exist while processing and download are required.</p>
+        <p>When you explicitly use a server-backed tool, including Konvertira through ChatGPT, the file may be transferred to or retrieved by Konvertira's server for temporary processing. ChatGPT file downloads are accepted only from configured HTTPS OpenAI download hosts. The file is processed only for the requested operation, and temporary files may exist while processing and download are required.</p>
         <p>Konvertira does not silently upload an image when local processing fails. The current image tool shows an error and keeps the file on your device.</p>
 
         <h2>5. Temporary storage</h2>
-        <p>Files processed on the server may be stored temporarily so the requested operation can be completed and the result downloaded. Temporary processed files are currently configured to be removed after approximately 15 minutes.</p>
+        <p>Files processed on the server may be stored temporarily so the requested operation can be completed and the result downloaded. The default configuration removes temporary processed files after approximately 15 minutes; operators may configure a different bounded retention period.</p>
         <p>This describes Konvertira’s configured application storage. It does not claim immediate deletion from every cache, backup, or underlying infrastructure system.</p>
 
         <h2>6. Accounts and necessary data</h2>

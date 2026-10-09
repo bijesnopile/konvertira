@@ -21,14 +21,16 @@ export function validateLocalImageDescriptor(file: LocalFileDescriptor): void {
   if (!formatFromMimeType(file.type) && !formatFromFilename(file.name)) {
     throw new LocalImageProcessingError(
       'This format is not currently supported for local processing.',
+      'unsupported_format',
     )
   }
   if (file.size <= 0) {
-    throw new LocalImageProcessingError('This image is empty. Choose another file.')
+    throw new LocalImageProcessingError('This image is empty. Choose another file.', 'invalid_file')
   }
   if (file.size > LOCAL_IMAGE_LIMITS.maxSizeMb * 1024 * 1024) {
     throw new LocalImageProcessingError(
       `This image is larger than the ${LOCAL_IMAGE_LIMITS.maxSizeMb} MB local-processing safety limit.`,
+      'file_too_large',
     )
   }
 }
@@ -40,6 +42,7 @@ export async function detectLocalImageFormat(file: File): Promise<LocalImageForm
   if (!detected) {
     throw new LocalImageProcessingError(
       'This file is corrupted or is not a supported JPG, PNG, or WEBP image.',
+      'invalid_file',
     )
   }
   return detected
@@ -53,6 +56,7 @@ export function validatePixelCount(width: number, height: number): void {
     const megapixels = Math.round(LOCAL_IMAGE_LIMITS.maxPixels / 1_000_000)
     throw new LocalImageProcessingError(
       `This image exceeds the ${megapixels}-megapixel browser safety limit. Try a smaller image.`,
+      'decoded_content_too_large',
     )
   }
 }
@@ -66,6 +70,7 @@ export async function rejectAnimatedWebP(file: File, format: LocalImageFormat): 
   if (hasAnimationFlag || hasAnimationChunk) {
     throw new LocalImageProcessingError(
       'Animated WEBP images are not currently supported for local conversion.',
+      'unsupported_feature',
     )
   }
 }

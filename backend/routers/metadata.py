@@ -5,6 +5,7 @@ import asyncio
 from fastapi import APIRouter, Depends, File, HTTPException, Query, Request, UploadFile
 from fastapi.responses import Response
 
+from backend.errors import normalize_processing_error
 from backend.models.files import FileProcessingError, StorageError
 from backend.processors.image import remove_image_metadata
 from backend.schemas.requests import ActionRequest
@@ -19,15 +20,21 @@ from backend.services.security import (
 )
 from backend.services.storage import api_storage
 from backend.utils.filenames import clean_filename, cleaned_output_filename
-from backend.utils.mime import ALLOWED_IMAGE_MIME_TYPES, get_content_type
+from backend.utils.mime import get_content_type
+from backend.utils.validation import validate_image_mime_type
 from config import settings
 
 router = APIRouter()
 
 
 def _raise_http(error: Exception) -> None:
-    status_code = getattr(error, "status_code", 500)
-    raise HTTPException(status_code=status_code, detail=str(error)) from error
+    if isinstance(error, StorageError) and not hasattr(error, "code"):
+        raise HTTPException(status_code=error.status_code, detail=str(error)) from error
+    normalized = normalize_processing_error(error)
+    raise HTTPException(
+        status_code=normalized.status_code,
+        detail=str(normalized.message),
+    ) from error
 
 
 @router.post("/remove-metadata/action", response_model=ActionResponse)
@@ -39,10 +46,8 @@ async def remove_metadata_action(
     """Legacy GPT Actions endpoint; its path and response schema are unchanged."""
 
     file_ref = payload.openaiFileIdRefs[0]
-    if file_ref.mime_type not in ALLOWED_IMAGE_MIME_TYPES:
-        raise HTTPException(status_code=415, detail="Supported formats are JPEG, PNG and WEBP.")
-
     try:
+        validate_image_mime_type(file_ref.mime_type)
         async with heavy_request_guard(http_request):
             image_bytes = await download_openai_file(file_ref.download_link)
             processed, stored = await asyncio.to_thread(
@@ -56,7 +61,7 @@ async def remove_metadata_action(
 
     return ActionResponse(
         success=True,
-        filename=cleaned_output_filename(file_ref.name),
+        filename=cleaned_output_filename(file_ref.name, processed.image_format),
         content_type=get_content_type(processed.image_format),
         download_url=f"{settings.public_base_url}/download/{stored.token}",
         message=(
@@ -98,9 +103,8 @@ async def remove_metadata_upload(
 ) -> Response:
     """Public multipart endpoint used by the Konvertira website."""
 
-    if file.content_type and file.content_type not in ALLOWED_IMAGE_MIME_TYPES:
-        raise HTTPException(status_code=415, detail="Supported formats are JPEG, PNG and WEBP.")
     try:
+        validate_image_mime_type(file.content_type)
         async with heavy_request_guard(request):
             image_bytes = await read_upload_limited(file)
             processed = await asyncio.to_thread(remove_image_metadata, image_bytes)
@@ -108,7 +112,7 @@ async def remove_metadata_upload(
         _raise_http(exc)
         raise AssertionError("unreachable")
 
-    filename = cleaned_output_filename(clean_filename(file.filename))
+    filename = cleaned_output_filename(clean_filename(file.filename), processed.image_format)
     return Response(
         content=processed.content,
         media_type=get_content_type(processed.image_format),

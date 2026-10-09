@@ -4,28 +4,30 @@ import { ToolCard } from '../components/ToolCard'
 
 const features = [
   {
-    title: 'Remove metadata',
-    description: 'Create a new image without intentionally copying EXIF, GPS, or camera data.',
+    title: 'Image conversion',
+    description: 'Convert, resize, and compress common images locally, or use clearly labeled server codecs for HEIC, AVIF, and static GIF.',
+    href: '/convert',
     icon: <><path d="M12 3 5 6v5c0 4.6 2.8 8.5 7 10 4.2-1.5 7-5.4 7-10V6l-7-3Z" /><path d="m9 12 2 2 4-4" /></>,
   },
   {
-    title: 'Convert images',
-    description: 'Move between JPG, PNG, and WEBP with a simple, focused workflow.',
+    title: 'PDF tools',
+    description: 'Merge, split, reorder, extract, rasterize, create, optimize, and inspect PDFs with bounded server processing.',
+    href: '/pdf-tools',
     icon: <><path d="M7 7h11l-3-3" /><path d="m18 7-3 3" /><path d="M17 17H6l3 3" /><path d="m6 17 3-3" /></>,
   },
   {
-    title: 'Privacy-focused processing',
-    description: 'Supported image operations run locally in your browser without an upload.',
+    title: 'Metadata privacy',
+    description: 'Inspect supported metadata and create cleaned copies without claiming anonymity, redaction, or malware removal.',
+    href: '/metadata',
     icon: <><rect x="5" y="10" width="14" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></>,
   },
   {
-    title: 'More file types soon',
-    description: 'Useful tools for documents, presentations, and spreadsheets are next.',
+    title: 'Documents and Office',
+    description: 'Convert supported documents, spreadsheets, and presentations with honest fidelity warnings.',
+    href: '/convert',
     icon: <><path d="M7 3h7l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" /><path d="M14 3v5h5" /><path d="M9 13h6M9 17h4" /></>,
   },
 ]
-
-const upcoming = ['PDF metadata removal', 'PDF to image', 'DOCX to PDF', 'XLSX to PDF', 'PPTX to PDF', 'Metadata inspection']
 
 export function HomePage() {
   return (
@@ -38,14 +40,14 @@ export function HomePage() {
             Convert files. Remove metadata. <span className="text-forest-700">Keep control.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
-            Convert JPG, PNG, and WEBP images or remove common embedded metadata directly in your browser—without uploading the image to Konvertira.
+            Use local image tools without uploading, or choose clearly labeled server tools for PDF, document, spreadsheet, presentation, and advanced image workflows.
           </p>
           <div className="mt-9 flex flex-col items-center gap-3">
             <Link to="/#tools" className="button-primary px-7 py-3.5 text-base">
               Choose a file
               <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></svg>
             </Link>
-            <span className="text-sm text-slate-500">No account required · No image upload</span>
+            <span className="text-sm text-slate-500">No account required · Processing mode shown before you start</span>
           </div>
         </div>
       </section>
@@ -57,7 +59,7 @@ export function HomePage() {
           <div>
             <p className="eyebrow text-forest-300">Clear by default</p>
             <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-5xl">Privacy by design</h2>
-            <p className="mt-5 max-w-xl text-base leading-7 text-white/70 sm:text-lg">For supported image tools, your browser does the work and the image does not need to reach our server. If a future tool requires an upload, Konvertira will tell you before it happens.</p>
+            <p className="mt-5 max-w-xl text-base leading-7 text-white/70 sm:text-lg">For supported local image tools, your browser does the work and the image does not reach our server. Tools that require an upload are labeled as server processing before you select or submit a file.</p>
             <Link to="/privacy" className="mt-7 inline-flex items-center gap-2 rounded-lg text-sm font-semibold text-white underline decoration-white/30 underline-offset-4 hover:decoration-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-forest-900">
               Read our privacy policy <span aria-hidden="true">→</span>
             </Link>
@@ -66,7 +68,7 @@ export function HomePage() {
             <ProcessingModeInfo
               mode="local"
               title="Images"
-              description="JPG, PNG, and WEBP conversion and metadata removal run on your device."
+              description="JPG, PNG, and static WEBP conversion and metadata removal run on your device."
               className="h-full"
             >
               <ul className="mt-5 space-y-2 text-sm text-slate-600">
@@ -77,8 +79,8 @@ export function HomePage() {
             </ProcessingModeInfo>
             <ProcessingModeInfo
               mode="server"
-              title="Some document tools"
-              description="PDFs, Office files, unsupported formats, and MCP workflows may need server infrastructure."
+              title="Server workflows"
+              description="PDFs, documents, advanced image codecs, Office files, and MCP workflows use server infrastructure."
               className="h-full"
             >
               <ul className="mt-5 space-y-2 text-sm text-slate-600">
@@ -99,33 +101,28 @@ export function HomePage() {
           </div>
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {features.map((feature) => (
-              <article key={feature.title} className="rounded-2xl border border-black/[0.07] bg-white p-6 shadow-sm">
+              <Link key={feature.title} to={feature.href} className="rounded-2xl border border-black/[0.07] bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-forest-300">
                 <span className="grid h-11 w-11 place-items-center rounded-xl bg-forest-100 text-forest-800" aria-hidden="true">
                   <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{feature.icon}</svg>
                 </span>
                 <h3 className="mt-5 font-semibold text-ink">{feature.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-600">{feature.description}</p>
-              </article>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="border-t border-black/[0.06] bg-white px-5 py-20 sm:px-8 sm:py-28 lg:px-10" aria-labelledby="coming-soon-heading">
+      <section className="border-t border-black/[0.06] bg-white px-5 py-20 sm:px-8 sm:py-28 lg:px-10" aria-labelledby="tools-overview-heading">
         <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-            <div><p className="eyebrow">What’s next</p><h2 id="coming-soon-heading" className="mt-4 text-3xl font-semibold tracking-tight text-ink sm:text-5xl">More useful tools are on the way</h2></div>
-            <span className="w-fit rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-amber-800">Coming soon</span>
+          <p className="eyebrow">Available now</p>
+          <h2 id="tools-overview-heading" className="mt-4 text-3xl font-semibold tracking-tight text-ink sm:text-5xl">Choose the right tool and processing mode</h2>
+          <p className="mt-5 max-w-2xl text-sm leading-6 text-slate-600">Local tools never fall back to an upload. Server tools are bounded by file, page, pixel, concurrency, timeout, and temporary-storage limits.</p>
+          <div className="mt-9 flex flex-wrap gap-3">
+            <Link to="/convert" className="button-primary">All converters</Link>
+            <Link to="/pdf-tools" className="button-secondary">PDF toolkit</Link>
+            <Link to="/metadata" className="button-secondary">Metadata tools</Link>
           </div>
-          <p className="mt-5 max-w-2xl text-sm leading-6 text-slate-600">These tools are not active yet. If one requires server processing, it will be clearly labeled before a file is uploaded.</p>
-          <ul className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {upcoming.map((item) => (
-              <li key={item} className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50/70 px-5 py-4 text-sm font-semibold text-slate-600" aria-disabled="true">
-                {item}
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
     </>

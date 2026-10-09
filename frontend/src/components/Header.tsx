@@ -3,7 +3,9 @@ import { Link, useLocation } from 'react-router-dom'
 import { Logo } from './Logo'
 
 const navItems = [
-  { label: 'Tools', href: '/#tools' },
+  { label: 'Convert', href: '/convert' },
+  { label: 'PDF', href: '/pdf-tools' },
+  { label: 'Metadata', href: '/metadata' },
   { label: 'Privacy', href: '/privacy' },
   { label: 'About', href: '/about' },
 ]
@@ -19,7 +21,7 @@ export function Header() {
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Main navigation">
           {navItems.map((item) => {
-            const active = item.href !== '/#tools' && location.pathname === item.href
+            const active = location.pathname === item.href
             return (
               <Link key={item.href} to={item.href} className={`nav-link ${active ? 'text-forest-800' : ''}`} aria-current={active ? 'page' : undefined}>
                 {item.label}
@@ -29,7 +31,7 @@ export function Header() {
         </nav>
 
         <div className="hidden md:block">
-          <Link to="/#tools" className="button-primary px-5 py-2.5 text-sm">Start converting</Link>
+          <Link to="/convert" className="button-primary px-5 py-2.5 text-sm">Start converting</Link>
         </div>
 
         <button
@@ -54,7 +56,7 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
-            <Link to="/#tools" onClick={() => setMenuOpen(false)} className="button-primary mt-3 w-full">Start converting</Link>
+            <Link to="/convert" onClick={() => setMenuOpen(false)} className="button-primary mt-3 w-full">Start converting</Link>
           </div>
         </nav>
       )}

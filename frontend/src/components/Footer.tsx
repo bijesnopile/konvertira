@@ -11,6 +11,9 @@ export function Footer() {
             <p className="mt-4 text-sm leading-6 text-white/65">Independent file tools with local image processing and clear server-use labels.</p>
           </div>
           <nav className="grid grid-cols-2 gap-x-12 gap-y-3 text-sm sm:grid-cols-3" aria-label="Footer navigation">
+            <Link className="footer-link" to="/convert">Convert</Link>
+            <Link className="footer-link" to="/pdf-tools">PDF tools</Link>
+            <Link className="footer-link" to="/metadata">Metadata</Link>
             <Link className="footer-link" to="/privacy">Privacy</Link>
             <Link className="footer-link" to="/terms">Terms</Link>
             <Link className="footer-link" to="/support">Support</Link>

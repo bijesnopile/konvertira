@@ -1,33 +1,32 @@
 import type { LocalImageFormat, LocalImageMimeType } from '../types/image'
+import {
+  formatFromFilename as registryFormatFromFilename,
+  formatFromMimeType as registryFormatFromMimeType,
+  formatFromId,
+  formatsForMode,
+} from '../formats/registry'
 
-const MIME_TO_FORMAT: Record<LocalImageMimeType, LocalImageFormat> = {
-  'image/jpeg': 'jpeg',
-  'image/png': 'png',
-  'image/webp': 'webp',
+const LOCAL_IMAGES = formatsForMode('local', 'image')
+const LOCAL_IMAGE_IDS = new Set(LOCAL_IMAGES.map((format) => format.id))
+
+export const LOCAL_IMAGE_ACCEPT = LOCAL_IMAGES
+  .flatMap((format) => [...format.extensions, format.preferredMimeType])
+  .join(',')
+
+export const LOCAL_IMAGE_FORMATS = Object.freeze(
+  LOCAL_IMAGES.map((format) => format.id as LocalImageFormat),
+)
+
+function asLocalImageFormat(id: string | undefined): LocalImageFormat | undefined {
+  return id && LOCAL_IMAGE_IDS.has(id) ? id as LocalImageFormat : undefined
 }
-
-const FORMAT_TO_MIME: Record<LocalImageFormat, LocalImageMimeType> = {
-  jpeg: 'image/jpeg',
-  png: 'image/png',
-  webp: 'image/webp',
-}
-
-const EXTENSION_TO_FORMAT: Record<string, LocalImageFormat> = {
-  jpg: 'jpeg',
-  jpeg: 'jpeg',
-  png: 'png',
-  webp: 'webp',
-}
-
-export const LOCAL_IMAGE_ACCEPT = '.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp'
 
 export function formatFromMimeType(mimeType: string): LocalImageFormat | undefined {
-  return MIME_TO_FORMAT[mimeType.toLowerCase() as LocalImageMimeType]
+  return asLocalImageFormat(registryFormatFromMimeType(mimeType)?.id)
 }
 
 export function formatFromFilename(filename: string): LocalImageFormat | undefined {
-  const extension = filename.trim().toLowerCase().split('.').pop() || ''
-  return EXTENSION_TO_FORMAT[extension]
+  return asLocalImageFormat(registryFormatFromFilename(filename)?.id)
 }
 
 export function formatFromHeader(bytes: Uint8Array): LocalImageFormat | undefined {
@@ -58,23 +57,23 @@ export function formatFromHeader(bytes: Uint8Array): LocalImageFormat | undefine
 }
 
 export function mimeTypeForFormat(format: LocalImageFormat): LocalImageMimeType {
-  return FORMAT_TO_MIME[format]
+  return formatFromId(format)?.preferredMimeType as LocalImageMimeType
 }
 
 export function extensionForFormat(format: LocalImageFormat): 'jpg' | 'png' | 'webp' {
-  return format === 'jpeg' ? 'jpg' : format
+  return formatFromId(format)?.preferredExtension.slice(1) as 'jpg' | 'png' | 'webp'
 }
 
 export function formatLabel(format: LocalImageFormat): 'JPG' | 'PNG' | 'WEBP' {
-  return format === 'jpeg' ? 'JPG' : format.toUpperCase() as 'PNG' | 'WEBP'
+  return (format === 'jpeg' ? 'JPG' : formatFromId(format)?.label) as 'JPG' | 'PNG' | 'WEBP'
 }
 
 export function isLossyFormat(format: LocalImageFormat): boolean {
-  return format === 'jpeg' || format === 'webp'
+  return formatFromId(format)?.capabilities.quality ?? false
 }
 
 export function requiresOpaqueBackground(format: LocalImageFormat): boolean {
-  return format === 'jpeg'
+  return formatFromId(format)?.constraints.includes('no_transparency') ?? false
 }
 
 export function asciiAt(bytes: Uint8Array, offset: number, text: string): boolean {

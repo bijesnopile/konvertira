@@ -4,11 +4,11 @@ import asyncio
 from contextlib import asynccontextmanager, suppress
 from typing import AsyncIterator
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.compat import cleanup_old_files, download_openai_file, remove_metadata
-from backend.routers import conversion, downloads, health, metadata
+from backend.routers import conversion, documents, downloads, health, metadata, office, pdf, privacy
 from backend.schemas import ActionRequest, ActionResponse, OpenAIFileRef
 from backend.services.security import api_key_header, verify_api_key
 from backend.services.storage import api_storage, cleanup_periodically
@@ -47,7 +47,7 @@ def create_app() -> FastAPI:
     application = FastAPI(
         title=settings.app_name,
         version=settings.app_version,
-        description="Removes metadata from and converts JPEG, PNG, and WEBP images.",
+        description="Bounded server processing for Konvertira image, PDF, document, Office, and metadata workflows.",
         lifespan=lifespan,
     )
     application.add_middleware(
@@ -56,12 +56,35 @@ def create_app() -> FastAPI:
         allow_credentials=False,
         allow_methods=["GET", "POST", "OPTIONS"],
         allow_headers=["Accept", "Content-Type", "X-API-Key"],
-        expose_headers=["Content-Disposition"],
+        expose_headers=[
+            "Content-Disposition",
+            "X-Konvertira-Width",
+            "X-Konvertira-Height",
+            "X-Konvertira-Encoding-Attempts",
+            "X-Konvertira-Page-Count",
+            "X-Konvertira-Fidelity-Warning",
+            "X-Konvertira-Optimization",
+            "X-Konvertira-Removed-Fields",
+            "X-Konvertira-Privacy-Warning",
+        ],
     )
+
+    @application.middleware("http")
+    async def security_headers(request: Request, call_next):
+        response = await call_next(request)
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("X-Frame-Options", "DENY")
+        response.headers.setdefault("Referrer-Policy", "no-referrer")
+        response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+        return response
     application.include_router(health.router)
     application.include_router(metadata.router)
     application.include_router(conversion.router)
     application.include_router(downloads.router)
+    application.include_router(pdf.router)
+    application.include_router(documents.router)
+    application.include_router(office.router)
+    application.include_router(privacy.router)
     return application
 
 

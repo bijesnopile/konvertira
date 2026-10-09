@@ -9,7 +9,8 @@ from backend.models.files import FileProcessingError
 from backend.processors.image import convert_image
 from backend.services.security import heavy_request_guard, read_upload_limited
 from backend.utils.filenames import converted_output_filename
-from backend.utils.mime import ALLOWED_IMAGE_MIME_TYPES, get_content_type
+from backend.utils.mime import get_content_type, get_extension
+from backend.utils.validation import validate_image_mime_type
 
 router = APIRouter()
 
@@ -20,11 +21,18 @@ async def convert_image_upload(
     file: UploadFile = File(...),
     format: str = Form(...),
     quality: int = Form(90),
+    width: int | None = Form(None),
+    height: int | None = Form(None),
+    scale_percent: float | None = Form(None),
+    preserve_aspect_ratio: bool = Form(True),
+    allow_upscale: bool = Form(False),
+    progressive: bool = Form(True),
+    lossless: bool = Form(False),
+    target_size_bytes: int | None = Form(None),
+    background_color: str = Form("#ffffff"),
 ) -> Response:
-    if file.content_type and file.content_type not in ALLOWED_IMAGE_MIME_TYPES:
-        raise HTTPException(status_code=415, detail="Supported formats are JPEG, PNG and WEBP.")
-
     try:
+        validate_image_mime_type(file.content_type)
         async with heavy_request_guard(request):
             image_bytes = await read_upload_limited(file)
             processed = await asyncio.to_thread(
@@ -32,11 +40,20 @@ async def convert_image_upload(
                 image_bytes,
                 format,
                 quality=quality,
+                width=width,
+                height=height,
+                scale_percent=scale_percent,
+                preserve_aspect_ratio=preserve_aspect_ratio,
+                allow_upscale=allow_upscale,
+                progressive=progressive,
+                lossless=lossless,
+                target_size_bytes=target_size_bytes,
+                background_color=background_color,
             )
     except FileProcessingError as exc:
         raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
 
-    extension = "jpg" if processed.image_format == "JPEG" else processed.image_format.lower()
+    extension = get_extension(processed.image_format)
     filename = converted_output_filename(file.filename, extension)
     return Response(
         content=processed.content,
@@ -45,5 +62,8 @@ async def convert_image_upload(
             "Cache-Control": "no-store",
             "Content-Disposition": f'attachment; filename="{filename}"',
             "X-Content-Type-Options": "nosniff",
+            "X-Konvertira-Width": str(processed.width or ""),
+            "X-Konvertira-Height": str(processed.height or ""),
+            "X-Konvertira-Encoding-Attempts": str(processed.encoding_attempts),
         },
     )

@@ -1,4 +1,4 @@
-import type { MetadataInspection, OutputFormat, ProcessedFile } from '../types/conversion'
+import type { MetadataInspection, OutputFormat, ProcessedFile, ServerImageConversionOptions } from '../types/conversion'
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
 
@@ -81,6 +81,9 @@ async function postFile(
   return {
     blob,
     filename: filenameFromDisposition(response.headers.get('content-disposition'), fallbackFilename),
+    width: Number(response.headers.get('x-konvertira-width')) || undefined,
+    height: Number(response.headers.get('x-konvertira-height')) || undefined,
+    encodingAttempts: Number(response.headers.get('x-konvertira-encoding-attempts')) || undefined,
   }
 }
 
@@ -93,13 +96,26 @@ export function removeMetadata(file: File): Promise<ProcessedFile> {
 }
 
 /** POST /images/convert with `file` and `format` multipart fields. */
-export function convertImage(file: File, format: OutputFormat): Promise<ProcessedFile> {
+export function convertImage(
+  file: File,
+  format: OutputFormat,
+  options: ServerImageConversionOptions = {},
+): Promise<ProcessedFile> {
   const dot = file.name.lastIndexOf('.')
   const basename = dot > 0 ? file.name.slice(0, dot) : file.name
-  return postFile('/images/convert', file, `${basename}.${format}`, { format })
+  const fields: Record<string, string> = { format }
+  if (options.quality !== undefined) fields.quality = String(options.quality)
+  if (options.width !== undefined) fields.width = String(options.width)
+  if (options.height !== undefined) fields.height = String(options.height)
+  if (options.preserveAspectRatio !== undefined) fields.preserve_aspect_ratio = String(options.preserveAspectRatio)
+  if (options.allowUpscale !== undefined) fields.allow_upscale = String(options.allowUpscale)
+  if (options.lossless !== undefined) fields.lossless = String(options.lossless)
+  if (options.targetSizeBytes !== undefined) fields.target_size_bytes = String(options.targetSizeBytes)
+  if (options.backgroundColor !== undefined) fields.background_color = options.backgroundColor
+  return postFile('/images/convert', file, `${basename}.${format}`, fields)
 }
 
-/** Prepared for the future metadata-inspection endpoint; not exposed as an active UI feature. */
+/** Inspect image metadata through the explicit server-backed endpoint. */
 export async function inspectMetadata(file: File): Promise<MetadataInspection> {
   if (!API_BASE_URL) {
     throw new ApiError('The processing service is not configured. Set VITE_API_BASE_URL and rebuild the app.')
@@ -118,4 +134,56 @@ export async function inspectMetadata(file: File): Promise<MetadataInspection> {
   }
   if (!response.ok) throw new ApiError(await getErrorMessage(response), response.status)
   return response.json() as Promise<MetadataInspection>
+}
+
+export async function processPdf(
+  path: string,
+  files: readonly File[],
+  fields: Record<string, string> = {},
+): Promise<ProcessedFile> {
+  if (!API_BASE_URL) throw new ApiError('The processing service is not configured.')
+  const formData = new FormData()
+  const multi = path === '/pdf/merge' || path === '/pdf/images-to-pdf'
+  files.forEach((file) => formData.append(multi ? 'files' : 'file', file))
+  Object.entries(fields).forEach(([key, value]) => formData.append(key, value))
+  const response = await fetch(`${API_BASE_URL}${path}`, { method: 'POST', body: formData })
+  if (!response.ok) throw new ApiError(await getErrorMessage(response), response.status)
+  const blob = await response.blob()
+  return {
+    blob,
+    filename: filenameFromDisposition(response.headers.get('content-disposition'), 'konvertira-result'),
+  }
+}
+
+export async function inspectPdfMetadata(file: File): Promise<Record<string, unknown>> {
+  if (!API_BASE_URL) throw new ApiError('The processing service is not configured.')
+  const formData = new FormData()
+  formData.append('file', file)
+  const response = await fetch(`${API_BASE_URL}/pdf/inspect-metadata`, { method: 'POST', body: formData })
+  if (!response.ok) throw new ApiError(await getErrorMessage(response), response.status)
+  return response.json() as Promise<Record<string, unknown>>
+}
+
+export function convertDocument(file: File, outputFormat: string): Promise<ProcessedFile> {
+  const basename = file.name.includes('.') ? file.name.slice(0, file.name.lastIndexOf('.')) : file.name
+  return postFile('/documents/convert', file, `${basename}.${outputFormat}`, { output_format: outputFormat })
+}
+
+export function convertOffice(file: File, outputFormat: string, delimiter?: string): Promise<ProcessedFile> {
+  const basename = file.name.includes('.') ? file.name.slice(0, file.name.lastIndexOf('.')) : file.name
+  const fields: Record<string, string> = { output_format: outputFormat }
+  if (delimiter) fields.delimiter = delimiter
+  return postFile('/office/convert', file, `${basename}.${outputFormat}`, fields)
+}
+
+export async function inspectFileMetadata(file: File): Promise<Record<string, unknown>> {
+  if (!API_BASE_URL) throw new ApiError('The processing service is not configured.')
+  const formData = new FormData(); formData.append('file', file)
+  const response = await fetch(`${API_BASE_URL}/metadata/inspect`, { method: 'POST', body: formData })
+  if (!response.ok) throw new ApiError(await getErrorMessage(response), response.status)
+  return response.json() as Promise<Record<string, unknown>>
+}
+
+export function removeFileMetadata(file: File): Promise<ProcessedFile> {
+  return postFile('/metadata/remove', file, `${file.name}-metadata-removed`)
 }

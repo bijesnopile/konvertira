@@ -6,6 +6,7 @@ import { NotFoundPage } from './pages/NotFoundPage'
 import { PrivacyPage } from './pages/PrivacyPage'
 import { SupportPage } from './pages/SupportPage'
 import { TermsPage } from './pages/TermsPage'
+import { ConvertPage, MetadataPage, PdfToolsPage } from './pages/ToolPages'
 
 export default function App() {
   return (
@@ -17,6 +18,9 @@ export default function App() {
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/support" element={<SupportPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/convert" element={<ConvertPage />} />
+          <Route path="/pdf-tools" element={<PdfToolsPage />} />
+          <Route path="/metadata" element={<MetadataPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

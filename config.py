@@ -44,7 +44,7 @@ def _mcp_hosts() -> tuple[str, ...]:
 class Settings:
     """Application settings loaded once from environment variables."""
 
-    app_name: str = field(default_factory=lambda: os.getenv("APP_NAME", "Image Privacy Protector"))
+    app_name: str = field(default_factory=lambda: os.getenv("APP_NAME", "Konvertira"))
     app_version: str = field(default_factory=lambda: os.getenv("APP_VERSION", "3.0.0"))
     port: int = field(default_factory=lambda: int(os.getenv("PORT", "8000")))
     public_base_url: str = field(
@@ -63,7 +63,51 @@ class Settings:
     max_image_size: int = field(
         default_factory=lambda: int(os.getenv("MAX_IMAGE_SIZE", str(20 * 1024 * 1024)))
     )
+    max_image_output_size: int = field(
+        default_factory=lambda: int(os.getenv("MAX_IMAGE_OUTPUT_SIZE", str(100 * 1024 * 1024)))
+    )
     max_pixels: int = field(default_factory=lambda: int(os.getenv("MAX_PIXELS", "100000000")))
+    image_target_size_attempts: int = field(
+        default_factory=lambda: min(
+            10,
+            max(1, int(os.getenv("IMAGE_TARGET_SIZE_ATTEMPTS", "7"))),
+        )
+    )
+    max_pdf_size: int = field(
+        default_factory=lambda: int(os.getenv("MAX_PDF_SIZE", str(40 * 1024 * 1024)))
+    )
+    max_pdf_files: int = field(default_factory=lambda: int(os.getenv("MAX_PDF_FILES", "10")))
+    max_pdf_total_size: int = field(
+        default_factory=lambda: int(os.getenv("MAX_PDF_TOTAL_SIZE", str(100 * 1024 * 1024)))
+    )
+    max_pdf_output_size: int = field(
+        default_factory=lambda: int(os.getenv("MAX_PDF_OUTPUT_SIZE", str(100 * 1024 * 1024)))
+    )
+    max_pdf_pages: int = field(default_factory=lambda: int(os.getenv("MAX_PDF_PAGES", "250")))
+    max_pdf_raster_dpi: int = field(
+        default_factory=lambda: int(os.getenv("MAX_PDF_RASTER_DPI", "200"))
+    )
+    max_pdf_generated_pixels: int = field(
+        default_factory=lambda: int(os.getenv("MAX_PDF_GENERATED_PIXELS", "100000000"))
+    )
+    max_document_size: int = field(
+        default_factory=lambda: int(os.getenv("MAX_DOCUMENT_SIZE", str(25 * 1024 * 1024)))
+    )
+    max_document_output_size: int = field(
+        default_factory=lambda: int(os.getenv("MAX_DOCUMENT_OUTPUT_SIZE", str(100 * 1024 * 1024)))
+    )
+    document_job_timeout_seconds: float = field(
+        default_factory=lambda: float(os.getenv("DOCUMENT_JOB_TIMEOUT_SECONDS", "60"))
+    )
+    libreoffice_path: str = field(
+        default_factory=lambda: os.getenv("LIBREOFFICE_PATH", "libreoffice")
+    )
+    max_archive_entries: int = field(
+        default_factory=lambda: int(os.getenv("MAX_ARCHIVE_ENTRIES", "5000"))
+    )
+    max_archive_uncompressed_bytes: int = field(
+        default_factory=lambda: int(os.getenv("MAX_ARCHIVE_UNCOMPRESSED_BYTES", str(200 * 1024 * 1024)))
+    )
     max_temp_storage_bytes: int = field(
         default_factory=lambda: int(os.getenv("MAX_TEMP_STORAGE_BYTES", str(1024 * 1024 * 1024)))
     )
@@ -83,7 +127,7 @@ class Settings:
         default_factory=lambda: int(os.getenv("MAX_CONCURRENT_HEAVY_JOBS_PER_IP", "2"))
     )
     max_concurrent_heavy_jobs_global: int = field(
-        default_factory=lambda: int(os.getenv("MAX_CONCURRENT_HEAVY_JOBS_GLOBAL", "4"))
+        default_factory=lambda: int(os.getenv("MAX_CONCURRENT_HEAVY_JOBS_GLOBAL", "2"))
     )
     trusted_proxy_ips: tuple[str, ...] = field(
         default_factory=lambda: _csv("TRUSTED_PROXY_IPS", "127.0.0.1/32,::1/128")
@@ -98,7 +142,7 @@ class Settings:
         default_factory=lambda: int(os.getenv("MCP_HEAVY_JOBS_PER_MINUTE", "10"))
     )
     mcp_max_global_jobs: int = field(
-        default_factory=lambda: int(os.getenv("MCP_MAX_GLOBAL_JOBS", "4"))
+        default_factory=lambda: int(os.getenv("MCP_MAX_GLOBAL_JOBS", "2"))
     )
     mcp_job_timeout_seconds: float = field(
         default_factory=lambda: float(os.getenv("MCP_JOB_TIMEOUT_SECONDS", "60"))

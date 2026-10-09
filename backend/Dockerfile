@@ -8,10 +8,15 @@ WORKDIR /app
 
 RUN addgroup --system konvertira && adduser --system --ingroup konvertira konvertira
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libreoffice-writer libreoffice-calc libreoffice-impress fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY config.py main.py mcp_server.py ./
+COPY format_registry.json ./
 COPY backend ./backend
 COPY konvertira_mcp ./konvertira_mcp
 

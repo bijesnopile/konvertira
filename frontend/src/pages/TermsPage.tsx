@@ -28,7 +28,7 @@ export function TermsPage() {
         <p>Where legally permitted, disputes relating to these terms or the service will be subject to the jurisdiction of the competent courts in Croatia.</p>
         <h2>7. Changes and contact</h2>
         <p>These terms may be updated as the service changes.</p>
-        <p>Effective date: October 5, 2026.</p>
+        <p>Effective date: October 9, 2026.</p>
         <p>For questions about these terms or legal matters, contact: <a href="mailto:legal@konvertira.com">legal@konvertira.com</a>.</p>
         <p>Konvertira is an independently operated project based in Croatia.</p>
       </article>

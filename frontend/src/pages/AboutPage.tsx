@@ -15,8 +15,8 @@ export function AboutPage() {
             <div>
               <h2 className="text-2xl font-semibold tracking-tight text-ink">Why Konvertira exists</h2>
               <p className="mt-4 leading-7 text-slate-600">Konvertira started as a side project by a student who was tired of simple file conversions being locked behind subscriptions, unnecessary sign-ups, or confusing limits.</p>
-              <p className="mt-4 leading-7 text-slate-600">The first release focuses on useful image tasks: converting between JPG, PNG, and WEBP, and creating fresh image copies without intentionally carrying over common embedded metadata.</p>
-              <p className="mt-4 leading-7 text-slate-600">The project is still small and independently operated. Some limits are necessary, but the long-term goal is to support more formats, larger files, and more privacy-focused tools while keeping the service understandable and accessible.</p>
+              <p className="mt-4 leading-7 text-slate-600">Today it includes local JPG, PNG, and static WEBP workflows plus clearly labeled server tools for advanced images, PDFs, documents, spreadsheets, presentations, and supported metadata.</p>
+              <p className="mt-4 leading-7 text-slate-600">The project is still small and independently operated. File, page, pixel, time, concurrency, and temporary-storage limits keep it practical on modest infrastructure while the service remains understandable and accessible.</p>
             </div>
 
             <aside className="rounded-3xl bg-forest-900 p-8 text-white">
@@ -45,9 +45,9 @@ export function AboutPage() {
 
           <div className="mt-16 border-t border-black/10 pt-10 text-center">
             <h2 className="text-2xl font-semibold text-ink">Explore or contribute</h2>
-            <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-slate-600">Try the local image tools, or visit the public repository to follow development and report technical issues.</p>
+            <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-slate-600">Try a supported tool, or visit the public repository to follow development and report technical issues.</p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Link to="/#tools" className="button-primary">Choose an image</Link>
+              <Link to="/convert" className="button-primary">Explore converters</Link>
               <a href="https://github.com/bijesnopile/konvertira" target="_blank" rel="noopener noreferrer" className="button-secondary">View on GitHub</a>
             </div>
           </div>

@@ -12,6 +12,7 @@ import {
   formatLabel,
   isLossyFormat,
   LOCAL_IMAGE_ACCEPT,
+  LOCAL_IMAGE_FORMATS,
 } from '../utils/imageFormats'
 import { formatBytes, formatSizeDifference } from '../utils/files'
 import {
@@ -28,6 +29,10 @@ export function ToolCard() {
   const [action, setAction] = useState<LocalImageAction>('remove-metadata')
   const [format, setFormat] = useState<LocalImageFormat>('jpeg')
   const [quality, setQuality] = useState(90)
+  const [resizeEnabled, setResizeEnabled] = useState(false)
+  const [resizeWidth, setResizeWidth] = useState<number>()
+  const [resizeHeight, setResizeHeight] = useState<number>()
+  const [backgroundColor, setBackgroundColor] = useState('#ffffff')
   const [dragging, setDragging] = useState(false)
   const [inspecting, setInspecting] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -97,6 +102,11 @@ export function ToolCard() {
         action,
         outputFormat: format,
         qualityPercent: quality,
+        width: resizeEnabled ? resizeWidth : undefined,
+        height: resizeEnabled ? resizeHeight : undefined,
+        preserveAspectRatio: true,
+        allowUpscale: false,
+        backgroundColor,
       })
       setResult(processed)
     } catch (caught) {
@@ -178,7 +188,7 @@ export function ToolCard() {
                   <fieldset>
                     <legend className="mb-3 text-sm font-semibold text-ink">Output format</legend>
                     <div className="flex flex-wrap gap-3">
-                      {(['jpeg', 'png', 'webp'] as LocalImageFormat[]).map((option) => (
+                      {LOCAL_IMAGE_FORMATS.map((option) => (
                         <label key={option} className={`cursor-pointer rounded-xl border px-5 py-3 text-sm font-semibold transition-colors focus-within:ring-2 focus-within:ring-forest-500 focus-within:ring-offset-2 ${format === option ? 'border-forest-700 bg-forest-50 text-forest-800' : 'border-slate-200 text-slate-600 hover:border-slate-300'}`}>
                           <input type="radio" name="format" value={option} checked={format === option} onChange={() => { setFormat(option); setResult(undefined); setError(undefined) }} className="sr-only" />
                           {formatLabel(option)}
@@ -198,6 +208,31 @@ export function ToolCard() {
                     <input id="image-quality" type="range" min="10" max="100" step="5" value={quality} onChange={(event) => { setQuality(Number(event.target.value)); setResult(undefined) }} className="w-full accent-forest-700" />
                     <p className="mt-2 text-xs text-slate-500">Higher quality usually creates a larger file.</p>
                   </div>
+                )}
+
+                <div className="rounded-2xl border border-slate-200 p-4">
+                  <label className="flex items-center gap-3 text-sm font-semibold text-ink">
+                    <input type="checkbox" checked={resizeEnabled} onChange={(event) => { setResizeEnabled(event.target.checked); setResult(undefined) }} className="h-4 w-4 accent-forest-700" />
+                    Resize image
+                  </label>
+                  {resizeEnabled && (
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <label className="text-xs text-slate-600">Maximum width
+                        <input type="number" min="1" inputMode="numeric" value={resizeWidth ?? ''} onChange={(event) => setResizeWidth(event.target.value ? Number(event.target.value) : undefined)} placeholder={String(fileInfo.width)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                      </label>
+                      <label className="text-xs text-slate-600">Maximum height
+                        <input type="number" min="1" inputMode="numeric" value={resizeHeight ?? ''} onChange={(event) => setResizeHeight(event.target.value ? Number(event.target.value) : undefined)} placeholder={String(fileInfo.height)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                      </label>
+                      <p className="text-xs text-slate-500 sm:col-span-2">Aspect ratio is preserved and images are not enlarged by default.</p>
+                    </div>
+                  )}
+                </div>
+
+                {outputFormat === 'jpeg' && (
+                  <label className="flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-700">
+                    Transparency background
+                    <input type="color" value={backgroundColor} onChange={(event) => { setBackgroundColor(event.target.value); setResult(undefined) }} aria-label="JPEG transparency background" />
+                  </label>
                 )}
 
                 <button type="button" className="button-primary w-full py-3.5" onClick={() => void processFile()} disabled={loading}>

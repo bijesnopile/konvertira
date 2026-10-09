@@ -1,3 +1,5 @@
+import { normalizeFormat } from '../formats/registry'
+
 export function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(1)} KB`
@@ -12,13 +14,15 @@ export function readableImageType(file: File): string {
 
 export function safeOutputFilename(
   originalFilename: string,
-  extension: 'jpg' | 'png' | 'webp',
+  extension: string,
   suffix = '',
 ): string {
+  const outputFormat = normalizeFormat(extension)
+  if (!outputFormat?.implemented) throw new Error(`Unsupported output extension: ${extension}`)
   const basename = originalFilename.trim().replaceAll('\\', '/').split('/').pop() || 'image'
   const stem = basename.includes('.') ? basename.slice(0, basename.lastIndexOf('.')) : basename
   const safeStem = stem.replace(/[<>:"/\\|?*\u0000-\u001f]/g, '_').replace(/[. ]+$/g, '') || 'image'
-  return `${safeStem}${suffix}.${extension}`
+  return `${safeStem}${suffix}${outputFormat.preferredExtension}`
 }
 
 export function formatSizeDifference(outputSize: number, inputSize: number): string {

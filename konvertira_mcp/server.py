@@ -16,13 +16,25 @@ from backend.services.security import enforce_general_rate
 from backend.services.storage import cleanup_periodically
 from config import settings
 from konvertira_mcp.tools.image_metadata import mcp_storage, remove_image_metadata
+from konvertira_mcp.tools.workflows import (
+    convert_document,
+    convert_image,
+    convert_images_to_pdf,
+    convert_pdf_to_images,
+    convert_presentation,
+    convert_spreadsheet,
+    extract_pdf_file_pages,
+    inspect_file_metadata,
+    merge_pdf_files,
+    remove_file_metadata,
+)
 
 mcp = MCPServer(
-    name="Image Privacy Protector",
+    name="Konvertira",
     version="1.0.0",
     instructions=(
-        "Use remove_image_metadata when the user asks to remove embedded metadata "
-        "from exactly one uploaded JPEG, PNG, or WEBP image."
+        "Use Konvertira tools only for supported file conversion, PDF page workflows, "
+        "and metadata inspection/removal. All MCP file processing is temporary server processing."
     ),
 )
 
@@ -47,6 +59,42 @@ mcp.tool(
     },
     structured_output=True,
 )(remove_image_metadata)
+
+_COPY_ANNOTATIONS = ToolAnnotations(
+    read_only_hint=False,
+    destructive_hint=False,
+    open_world_hint=False,
+    idempotent_hint=True,
+)
+_INSPECT_ANNOTATIONS = ToolAnnotations(
+    read_only_hint=True,
+    destructive_hint=False,
+    open_world_hint=False,
+    idempotent_hint=True,
+)
+
+
+def _register_tool(name, title, description, function, *, inspect=False, file_params=("file",)):
+    mcp.tool(
+        name=name,
+        title=title,
+        description=description,
+        annotations=_INSPECT_ANNOTATIONS if inspect else _COPY_ANNOTATIONS,
+        meta={"openai/fileParams": list(file_params)},
+        structured_output=True,
+    )(function)
+
+
+_register_tool("convert_image", "Convert an image", "Convert one supported static image to JPEG, PNG, WebP, or AVIF with optional bounded resize settings. Animated images are rejected.", convert_image)
+_register_tool("inspect_file_metadata", "Inspect file metadata", "Inspect supported image, PDF, OOXML, or ODF metadata. Results do not prove anonymity or absence of hidden content.", inspect_file_metadata, inspect=True)
+_register_tool("remove_file_metadata", "Remove supported file metadata", "Create a new supported image, PDF, OOXML, or ODF copy with metadata fields Konvertira knows how to remove.", remove_file_metadata)
+_register_tool("merge_pdfs", "Merge PDFs", "Merge 2 to 10 uploaded, unencrypted PDFs in the supplied order.", merge_pdf_files, file_params=("files",))
+_register_tool("extract_pdf_pages", "Extract PDF pages", "Extract a validated page selection such as 1-3,5 from one unencrypted PDF.", extract_pdf_file_pages)
+_register_tool("convert_pdf_to_images", "Convert PDF pages to images", "Render bounded pages from one unencrypted PDF into a ZIP of PNG, JPEG, or WebP images. Rasterization is lossy.", convert_pdf_to_images)
+_register_tool("convert_images_to_pdf", "Convert images to PDF", "Create one PDF from 1 to 10 supported static images in the supplied order.", convert_images_to_pdf, file_params=("files",))
+_register_tool("convert_document", "Convert a document", "Convert one supported DOCX, DOC, ODT, RTF, TXT, Markdown, or HTML document using the explicit safe conversion matrix.", convert_document)
+_register_tool("convert_spreadsheet", "Convert a spreadsheet", "Convert one XLSX, XLS, ODS, or CSV file. Multi-sheet CSV output is packaged safely.", convert_spreadsheet)
+_register_tool("convert_presentation", "Convert a presentation", "Convert one PPTX, PPT, or ODP presentation to a supported presentation format or PDF.", convert_presentation)
 
 mcp_http_app = mcp.streamable_http_app(
     streamable_http_path="/",
@@ -75,9 +123,9 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 def create_app() -> FastAPI:
     application = FastAPI(
-        title="Image Privacy Protector MCP",
+        title="Konvertira MCP",
         version="1.0.0",
-        description="MCP server for removing embedded metadata from uploaded images.",
+        description="MCP server for supported Konvertira conversion, PDF, and metadata workflows.",
         lifespan=lifespan,
     )
 
@@ -87,23 +135,31 @@ def create_app() -> FastAPI:
             try:
                 mcp_resource_limits.check_request()
             except McpRateLimitError as exc:
-                return JSONResponse(
+                response = JSONResponse(
                     status_code=429,
                     content={"detail": str(exc)},
                     headers={"Retry-After": str(exc.retry_after)},
                 )
-        return await call_next(request)
+                response.headers["X-Content-Type-Options"] = "nosniff"
+                response.headers["Referrer-Policy"] = "no-referrer"
+                return response
+        response = await call_next(request)
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("X-Frame-Options", "DENY")
+        response.headers.setdefault("Referrer-Policy", "no-referrer")
+        response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+        return response
 
     application.mount("/mcp", mcp_http_app)
 
     @application.get("/health")
     async def health() -> dict[str, str]:
-        return {"status": "ok", "service": "Image Privacy Protector MCP"}
+        return {"status": "ok", "service": "Konvertira MCP"}
 
     @application.get("/")
     async def root() -> dict[str, str]:
         return {
-            "service": "Image Privacy Protector MCP",
+            "service": "Konvertira MCP",
             "version": "1.0.0",
             "mcp_endpoint": "/mcp",
             "status": "running",
@@ -112,11 +168,10 @@ def create_app() -> FastAPI:
     @application.get("/privacy")
     async def privacy() -> dict[str, str]:
         return {
-            "service": "Image Privacy Protector",
+            "service": "Konvertira",
             "privacy": (
-                "Uploaded images are processed temporarily for the purpose of removing "
-                "embedded metadata. Processed files are automatically removed after a "
-                "limited period."
+                "Uploaded files are processed temporarily for the selected conversion, PDF, "
+                "or metadata workflow. Results are automatically removed after a limited period."
             ),
         }
 

@@ -36,7 +36,7 @@ async def read_upload_limited(upload: UploadFile, limit: int | None = None) -> b
         limit_mb = size_limit // (1024 * 1024)
         raise HTTPException(
             status_code=413,
-            detail=f"The image is larger than the {limit_mb} MB limit.",
+            detail=f"The file is larger than the {limit_mb} MB limit.",
         )
     return content
 
@@ -53,7 +53,7 @@ async def read_request_body_limited(request: Request, limit: int | None = None) 
             limit_mb = size_limit // (1024 * 1024)
             raise HTTPException(
                 status_code=413,
-                detail=f"The image is larger than the {limit_mb} MB limit.",
+                detail=f"The file is larger than the {limit_mb} MB limit.",
             )
         chunks.append(chunk)
     return b"".join(chunks)

@@ -17,6 +17,8 @@ def test_openai_download_hosts_are_allowed(host: str) -> None:
         "http://files.oaiusercontent.com/file",
         "https://oaiusercontent.com.evil.example/file",
         "https://127.0.0.1/file",
+        "https://user:secret@files.oaiusercontent.com/file",
+        "https://files.oaiusercontent.com:8443/file",
     ],
 )
 def test_disallowed_download_urls(url: str) -> None:

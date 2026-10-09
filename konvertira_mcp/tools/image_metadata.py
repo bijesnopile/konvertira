@@ -3,12 +3,14 @@
 import asyncio
 
 from backend.models.files import FileProcessingError, StorageError
+from backend.formats import declared_format
 from backend.services.downloads import DownloadError, download_openai_file
 from backend.services.image_workflow import clean_and_store
 from backend.services.resource_limits import McpResourceError, mcp_resource_limits
 from backend.services.storage import TemporaryStorage
 from backend.utils.filenames import cleaned_output_filename
-from backend.utils.mime import ALLOWED_IMAGE_MIME_TYPES, get_content_type
+from backend.utils.mime import get_content_type
+from backend.utils.validation import validate_image_mime_type
 from config import settings
 from konvertira_mcp.models.files import OpenAIFile, ProcessedImage
 
@@ -27,12 +29,12 @@ async def remove_image_metadata(file: OpenAIFile) -> ProcessedImage:
     """Remove embedded metadata from one ChatGPT-uploaded image."""
 
     async def process() -> ProcessedImage:
-        if file.mime_type and file.mime_type not in ALLOWED_IMAGE_MIME_TYPES:
-            raise McpToolUserError(
-                "Unsupported image format. JPEG, PNG and WEBP are supported."
-            )
-
         try:
+            hints = declared_format(file.file_name, file.mime_type)
+            definition = hints.candidate
+            if not hints.is_consistent or definition is None or "server" not in definition.modes_for("removeMetadata"):
+                raise McpToolUserError("The file must be a JPEG, PNG, or static WebP image with matching type information.")
+            validate_image_mime_type(file.mime_type)
             image_bytes = await download_openai_file(str(file.download_url))
             processed, stored = await asyncio.to_thread(
                 clean_and_store,
@@ -46,7 +48,7 @@ async def remove_image_metadata(file: OpenAIFile) -> ProcessedImage:
 
         return ProcessedImage(
             success=True,
-            filename=cleaned_output_filename(file.file_name),
+            filename=cleaned_output_filename(file.file_name, processed.image_format),
             content_type=get_content_type(processed.image_format),
             download_url=f"{settings.mcp_public_base_url}/download/{stored.token}",
             message=(

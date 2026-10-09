@@ -1,11 +1,12 @@
 FROM node:22-alpine AS build
 
-WORKDIR /app
+WORKDIR /app/frontend
 
-COPY package.json package-lock.json ./
+COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 
-COPY . .
+COPY frontend .
+COPY format_registry.json /app/format_registry.json
 
 ARG VITE_API_BASE_URL=https://api.konvertira.com
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}

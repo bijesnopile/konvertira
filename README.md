@@ -1,146 +1,156 @@
 # Konvertira
 
-Konvertira is a privacy-first image conversion and metadata-removal service. The repository contains three independently deployable applications that share one image-processing core:
+Konvertira is an independently operated, privacy-focused file conversion and metadata-cleaning project. It has three applications sharing the same processors and declarative format registry:
 
-- `frontend/` — React, TypeScript, Vite, and Tailwind CSS application.
-- `backend/` — FastAPI routes, processors, services, schemas, and utilities.
-- `konvertira_mcp/` — MCP server and tools built on the same backend services.
+- `frontend/` — React, TypeScript, Vite, and Tailwind CSS.
+- `backend/` — FastAPI routes plus reusable processors and services.
+- `konvertira_mcp/` — MCP tools for ChatGPT, backed by the same server processors.
 
-The MCP package is named `konvertira_mcp` instead of `mcp` because the official MCP Python SDK already owns the top-level `mcp` package name. Using the requested name would shadow the SDK and prevent the server from importing.
+`main.py` and `mcp_server.py` are stable compatibility entry points. The MCP package is named `konvertira_mcp` so it does not shadow the official `mcp` Python package.
 
-The web frontend processes JPG/JPEG, PNG, and static WEBP images locally with browser canvas APIs. Image conversion and metadata stripping do not upload those files or call the backend. Backend image support remains available for MCP and future explicitly server-side workflows.
+## Processing modes
+
+JPG/JPEG, PNG, and static WebP conversion, resize, compression, batch conversion, and metadata-clean re-encoding run in the browser. Those local workflows do not call the API and never fall back to an upload.
+
+HEIC/HEIF, AVIF, static GIF, PDF, document, spreadsheet, presentation, unified metadata, and every MCP workflow are explicitly server-side. Server files are bounded, processed only for the selected operation, and any downloadable result stored by MCP or legacy API routes expires after `RESULT_TTL_SECONDS` (15 minutes by default).
+
+Metadata removal creates a new file. It is not redaction, malware sanitization, proof of anonymity, or removal of visible personal information.
+
+## Implemented formats and conversion matrix
+
+`format_registry.json` is the canonical source for format IDs, extensions, MIME aliases, capabilities, constraints, execution modes, and conversion edges. `backend/formats.py` and `frontend/src/formats/registry.ts` both read it.
+
+| Category | Inputs | Implemented outputs/operations | Mode |
+|---|---|---|---|
+| Images | JPEG, PNG, static WebP | JPEG, PNG, WebP; resize/compress; metadata-clean copy | Local and server |
+| Advanced images | HEIC/HEIF | JPEG, PNG, WebP | Server |
+| Advanced images | AVIF | JPEG, PNG, WebP | Server |
+| Advanced images | static GIF | JPEG, PNG, WebP | Server |
+| AVIF encoding | JPEG, PNG, static WebP | AVIF | Server |
+| PDF | PDF and supported images | Merge, extract, split, reorder, delete pages, PDF-to-images, images-to-PDF, inspect/remove metadata, structural optimization | Server |
+| Documents | DOCX | TXT, PDF, ODT | Server |
+| Documents | DOC | DOCX, PDF | Server |
+| Documents | ODT | DOCX, PDF | Server |
+| Documents | RTF | DOCX, PDF | Server |
+| Text | TXT | DOCX, PDF | Server |
+| Text | Markdown | HTML, DOCX, PDF | Server |
+| Documents | HTML | TXT | Server |
+| Spreadsheets | XLSX | CSV, ODS, PDF | Server |
+| Spreadsheets | XLS | CSV, XLSX, PDF | Server |
+| Spreadsheets | ODS | CSV, XLSX, PDF | Server |
+| Spreadsheets | CSV (UTF-8) | XLSX, ODS | Server |
+| Presentations | PPTX | PDF, ODP | Server |
+| Presentations | PPT | PPTX, PDF | Server |
+| Presentations | ODP | PPTX, PDF | Server |
+
+Animated images and encrypted PDFs are rejected. A workbook with multiple sheets becomes a ZIP containing one safely named CSV per sheet. CSV cannot preserve styles, charts, workbook structure, or formulas as formulas. Office conversions may change fonts, layout, formulas, charts, macros, embedded objects, links, animations, and transitions. Legacy DOC/XLS/PPT reliability depends on the installed LibreOffice version and fonts.
+
+Metadata inspection is implemented for supported images, PDF, DOCX/XLSX/PPTX, and ODT/ODS/ODP. Metadata removal is implemented for JPEG/PNG/WebP, PDF, and those OOXML/ODF packages. Office inspection covers common package properties, not every embedded object, comment, macro, external link, or hidden identifier.
 
 ## Architecture
 
 ```text
-HTTP router / MCP tool
-        ↓
-shared workflow and services
-        ↓
-pure image processor
-        ↓
-temporary token storage
+React local tool ── browser Canvas only
+
+FastAPI route ─┐
+MCP tool ──────┼─ resource guard ─ processor/service ─ response or TTL storage
+               └─ shared format registry and validation
 ```
 
-`main.py` and `mcp_server.py` are compatibility entry points only. Existing deployments using `uvicorn main:app` or `uvicorn mcp_server:app` remain supported.
+Processors do not know about HTTP or MCP schemas. Routers and tools validate declared filenames/MIME types, enforce resource guards, and dispatch to the same processing layer. Extensions and MIME claims remain untrusted; Pillow, pypdf/PyMuPDF, python-docx/openpyxl, LibreOffice, and guarded package parsing verify actual content as applicable.
 
-## Configuration
-
-Copy `.env.example` to `.env` and replace the placeholder API key:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Never place secrets in `VITE_*` variables; Vite embeds them into the public browser bundle. Backend and MCP settings are centralized in `config.py`.
-
-## Backend
+## Setup
 
 ```powershell
 python -m venv venv
 .\venv\Scripts\Activate.ps1
-python -m pip install -r requirements-dev.txt
+python -m pip install -r requirements.txt -r requirements-dev.txt
+Copy-Item .env.example .env
 uvicorn main:app --reload --port 8000
 ```
 
-Important endpoints:
-
-- `GET /health`
-- `POST /images/remove-metadata` — public multipart website endpoint
-- `POST /images/convert` — public multipart website endpoint
-- `POST /remove-metadata/action` — API-key-protected legacy GPT Action endpoint
-- `POST /remove-metadata/upload` — API-key-protected legacy raw upload endpoint
-- `GET /download/{token}` — temporary legacy result download
-
-## MCP server
+In another terminal:
 
 ```powershell
-.\venv\Scripts\Activate.ps1
 uvicorn mcp_server:app --reload --port 8001
-```
-
-The streamable HTTP endpoint remains `/mcp`. The registered `remove_image_metadata` tool downloads only allowlisted HTTPS OpenAI hosts, uses the shared image processor, and stores results temporarily.
-
-## Frontend
-
-```powershell
 Set-Location frontend
 npm install
 Copy-Item .env.example .env.local
 npm run dev
 ```
 
-Production checks:
+Python dependencies are pinned in `requirements.txt`. Pillow/pillow-heif handle image codecs; pypdf and PyMuPDF handle PDF structure/rasterization; python-docx, Markdown, Beautiful Soup, and openpyxl cover direct bounded conversions; defusedxml protects metadata XML parsing. LibreOffice Writer, Calc, Impress, and DejaVu fonts are installed only in the backend image for conversions that require an external engine.
+
+Never put secrets in `VITE_*` variables because Vite embeds them into the public bundle. `.env.example` contains placeholders only; `.env*`, keys, virtual environments, build output, temporary results, and backups are excluded from Docker build context.
+
+## HTTP API
+
+Public server-processing routes:
+
+- `GET /health`
+- `POST /images/convert`
+- `POST /images/remove-metadata`
+- `POST /pdf/{merge|extract|split|reorder|delete-pages|images-to-pdf|to-images|inspect-metadata|remove-metadata|optimize}`
+- `POST /documents/convert`
+- `POST /office/convert`
+- `POST /metadata/{inspect|remove}`
+
+Legacy API-key-protected compatibility routes remain `POST /remove-metadata/action` and `POST /remove-metadata/upload`, with `GET /download/{token}` for their temporary results.
+
+## MCP
+
+The streamable HTTP endpoint is `/mcp`. Tools are:
+
+- `remove_image_metadata` (backward-compatible original tool)
+- `convert_image`
+- `inspect_file_metadata`
+- `remove_file_metadata`
+- `merge_pdfs`
+- `extract_pdf_pages`
+- `convert_pdf_to_images`
+- `convert_images_to_pdf`
+- `convert_document`
+- `convert_spreadsheet`
+- `convert_presentation`
+
+MCP accepts typed OpenAI file references only. Downloads require HTTPS, revalidate every redirect, accept only configured OpenAI host suffixes, stream to a size limit, and use timeouts. It does not expose arbitrary URLs, paths, commands, or command-line options. The hostname allowlist substantially limits SSRF; DNS resolution is not pinned for the full connection lifetime, so production egress rules remain recommended defense in depth.
+
+## Resource and security controls
+
+Limits are centralized in `config.py` and documented in `.env.example`: input/output bytes, pixels, target-size attempts, PDF files/pages/DPI/generated pixels, document output, archive entries/uncompressed bytes, subprocess timeout, per-client/general/heavy quotas, global concurrency, temporary-storage capacity, and TTL.
+
+HTTP and MCP heavy jobs reject immediately when capacity is full; they do not maintain an unbounded queue. Defaults allow two global heavy jobs, suitable as a conservative starting point for a small VPS. MCP adds an overall 60-second job timeout and retains its slot while non-cancellable thread work finishes. LibreOffice has its own 60-second subprocess timeout and an isolated randomized profile/workspace. Run one backend worker and one MCP worker while using in-memory limiters; multiple workers or replicas require a shared limiter or equivalent reverse-proxy enforcement.
+
+Archive metadata handling validates entry count, total expanded bytes, encrypted/traversal entries, and expected OOXML/ODF package markers without extracting files. Multi-output ZIP names are generated by Konvertira. Download tokens are random and validated, results expire, storage capacity is bounded, and responses use `no-store` and `nosniff`.
+
+The frontend nginx configuration keeps a strict CSP without `unsafe-inline` or `unsafe-eval`, plus frame, referrer, permissions, COOP, CORP, and MIME-sniffing protections. Configure HSTS at Caddy after all covered domains are HTTPS-ready.
+
+## Docker and production
 
 ```powershell
-npm run typecheck
-npm test
-npm run build
+docker compose config --quiet
+docker compose build
+docker compose up -d
 ```
 
-## Tests
+Frontend, backend, and MCP ports bind to host loopback in Compose so Caddy can be the public entry point for `konvertira.com`, `api.konvertira.com`, and `mcp.konvertira.com`. Containers use non-root users where applicable, `no-new-privileges`, dropped backend/MCP capabilities, internal networking, health checks, and no Docker socket or host filesystem mount. Keep one Uvicorn worker per backend/MCP service. Temporary result volumes contain user data and must not be backed up.
+
+Set `VITE_API_BASE_URL=https://api.konvertira.com` during the production frontend build. Restrict direct origin access, set exact `TRUSTED_PROXY_IPS`, cap request bodies/timeouts at Caddy, redact `/download/*` tokens from proxy logs, and add coarse edge rate limits. The application revalidates forwarded client addresses only from configured trusted proxy peers.
+
+## Verification
 
 ```powershell
 .\venv\Scripts\python.exe -m pytest
 .\venv\Scripts\python.exe -m compileall -q main.py mcp_server.py config.py backend konvertira_mcp
+.\venv\Scripts\python.exe -m pip check
 .\venv\Scripts\python.exe -m pip_audit -r requirements.txt
 .\venv\Scripts\python.exe -m pip_audit -r requirements-dev.txt
+
+Set-Location frontend
+npm run typecheck
+npm test
+npm run build
+npm audit
 ```
 
-The suite covers metadata removal, supported and unsupported formats, file-size and resolution limits, conversion, filename cleaning, storage cleanup, download-host validation, FastAPI startup/routes, and MCP tool behavior.
-
-## Docker
-
-```powershell
-docker build -f backend/Dockerfile -t konvertira-backend .
-docker build --build-arg VITE_API_BASE_URL=https://api.konvertira.com -t konvertira-frontend ./frontend
-docker compose up --build -d
-docker compose ps
-```
-
-The development Compose file publishes backend and MCP ports only on the host loopback interface, not on external interfaces. The services also share an internal Docker network, ready for a future Caddy reverse proxy at `api.konvertira.com` and `mcp.konvertira.com`. Set `VITE_API_BASE_URL=https://api.konvertira.com` for the production build.
-
-## Temporary data
-
-Processed files use configurable temporary directories and are deleted after `RESULT_TTL_SECONDS`. `MAX_TEMP_STORAGE_BYTES` rejects new stored results with `503` if a temporary directory reaches its configured capacity. Compose mounts separate backend and MCP result volumes. These volumes contain short-lived user files and must not be included in backups. No database, authentication system, payments, analytics, or permanent file store is included.
-
-## Request and resource protection
-
-Browser-based JPG, PNG, and static WEBP operations do not call the server, so they are not rate limited. The regular HTTP API uses per-peer short-lived limits configured with:
-
-- `RATE_LIMIT_ENABLED`
-- `RATE_LIMIT_REQUESTS_PER_MINUTE`
-- `RATE_LIMIT_HEAVY_JOBS_PER_MINUTE`
-- `MAX_CONCURRENT_HEAVY_JOBS_PER_IP`
-- `MAX_CONCURRENT_HEAVY_JOBS_GLOBAL`
-
-The MCP/ChatGPT path deliberately uses global limits instead of guessing an end-user identity from OpenAI or proxy IPs:
-
-- `MCP_RATE_LIMIT_ENABLED=true`
-- `MCP_RATE_LIMIT_PER_MINUTE=30`
-- `MCP_HEAVY_JOBS_PER_MINUTE=10`
-- `MCP_MAX_GLOBAL_JOBS=4`
-- `MCP_JOB_TIMEOUT_SECONDS=60`
-- `MCP_MAX_TEMP_STORAGE_MB=512`
-
-The MCP transport checks its global request quota before dispatch. Each expensive tool then checks the stricter global heavy-job quota and immediately acquires a global processing slot before MIME validation, remote download, decode, transformation, or storage. Saturated work is rejected rather than queued. An overall timeout returns a safe tool error; if non-cancellable thread work is still finishing, its slot remains reserved until that work actually ends.
-
-Limit excess returns HTTP `429` with `Retry-After` where the HTTP layer supports it. `/health` is intentionally excluded. Limits and concurrent-job counts are per MCP application process, so run one MCP worker on the current small VPS. Multi-worker or multi-replica deployments need a shared limiter or equivalent global enforcement at the reverse proxy. Disabling `MCP_RATE_LIMIT_ENABLED` is intended for local development and does not disable concurrency, timeout, size, pixel, or storage safeguards.
-
-Client IP detection uses the socket peer by default. `CF-Connecting-IP`, `X-Real-IP`, and `X-Forwarded-For` are accepted only when the immediate peer matches `TRUSTED_PROXY_IPS`. In production, set this to the exact Caddy or container-network peer IP/CIDR, prevent direct public access to backend ports, and configure Caddy to trust forwarding headers only from Cloudflare's current published proxy ranges. Do not use an unrestricted private-network range merely for convenience.
-
-Cloudflare or another edge provider should add coarse per-path request limits for `/images/*`, `/mcp`, and `/download/*`, cap request body size, and block direct origin access. Edge protection complements the application limiter; it does not replace file-size, pixel, concurrency, or storage limits.
-
-For `mcp.konvertira.com`, optional Cloudflare/Caddy hardening should allow only required HTTP methods, apply a conservative MCP request-body cap, set upstream connection/read timeouts, and restrict direct origin traffic to the trusted proxy path. Treat Cloudflare/OpenAI source IPs as infrastructure addresses rather than reliable end-user identities; avoid aggressive per-IP rules that could group many legitimate ChatGPT calls together. Keep application-wide limits enabled even when edge rules are available.
-
-For a small VPS, begin with one MCP application worker, `MCP_MAX_GLOBAL_JOBS=2` to `4`, a 60-second timeout, and the existing 20 MB / 100 MP input limits. At the container layer, a reasonable initial envelope is 1–2 GB RAM, 1–2 CPUs, and a PID limit around 128, adjusted from observed peak memory before production traffic. These container limits are documented rather than forced because the repository does not know the VPS's total capacity.
-
-## Security deployment notes
-
-- Production CORS should contain only the deployed frontend origin; the example also contains localhost entries for development.
-- The frontend nginx CSP allows the production API and `http://localhost:8000`. If the API origin changes, update `connect-src` in `frontend/nginx.conf` and rebuild.
-- Terminate HTTPS at the public reverse proxy. Enable HSTS there only after every covered subdomain is HTTPS-ready.
-- Backend container access logs are disabled because temporary download tokens appear in URL paths. Ensure reverse-proxy logs also redact or omit `/download/*` tokens.
-- Use `docker compose config --quiet` for validation in shared terminals or CI logs. The non-quiet form expands `env_file` values and can print secrets.
-- Keep `API_KEY` server-side. Every `VITE_*` value is public in the browser bundle.
-- The in-process limiter is intentionally fail-closed for overload (rejecting new heavy work) and stores identifiers only for a short rolling window.
+The public pages are `/`, `/convert`, `/pdf-tools`, `/metadata`, `/privacy`, `/terms`, `/support`, and `/about`. `frontend/public/robots.txt` and `frontend/public/sitemap.xml` cover the public site routes.

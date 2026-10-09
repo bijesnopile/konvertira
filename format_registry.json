@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "formats": [
+    {
+      "id": "jpeg",
+      "label": "JPEG",
+      "category": "image",
+      "extensions": [".jpg", ".jpeg"],
+      "mimeTypes": ["image/jpeg", "image/jpg", "image/pjpeg"],
+      "preferredExtension": ".jpg",
+      "preferredMimeType": "image/jpeg",
+      "processorNames": ["JPEG", "JPG"],
+      "implemented": true,
+      "executionModes": ["local", "server"],
+      "operationModes": {"inspectMetadata": ["server"], "removeMetadata": ["local", "server"], "convert": ["local", "server"]},
+      "capabilities": {
+        "inspectMetadata": true,
+        "removeMetadata": true,
+        "merge": false,
+        "split": false,
+        "quality": true,
+        "compression": true,
+        "resize": true,
+        "multiFile": false
+      },
+      "lossiness": "typically_lossy",
+      "constraints": ["no_transparency", "reencoding_is_lossy"]
+    },
+    {
+      "id": "png",
+      "label": "PNG",
+      "category": "image",
+      "extensions": [".png"],
+      "mimeTypes": ["image/png", "image/x-png"],
+      "preferredExtension": ".png",
+      "preferredMimeType": "image/png",
+      "processorNames": ["PNG"],
+      "implemented": true,
+      "executionModes": ["local", "server"],
+      "operationModes": {"inspectMetadata": ["server"], "removeMetadata": ["local", "server"], "convert": ["local", "server"]},
+      "capabilities": {
+        "inspectMetadata": true,
+        "removeMetadata": true,
+        "merge": false,
+        "split": false,
+        "quality": false,
+        "compression": true,
+        "resize": true,
+        "multiFile": false
+      },
+      "lossiness": "lossless",
+      "constraints": ["supports_transparency"]
+    },
+    {
+      "id": "webp",
+      "label": "WebP",
+      "category": "image",
+      "extensions": [".webp"],
+      "mimeTypes": ["image/webp"],
+      "preferredExtension": ".webp",
+      "preferredMimeType": "image/webp",
+      "processorNames": ["WEBP"],
+      "implemented": true,
+      "executionModes": ["local", "server"],
+      "operationModes": {"inspectMetadata": ["server"], "removeMetadata": ["local", "server"], "convert": ["local", "server"]},
+      "capabilities": {
+        "inspectMetadata": true,
+        "removeMetadata": true,
+        "merge": false,
+        "split": false,
+        "quality": true,
+        "compression": true,
+        "resize": true,
+        "multiFile": false
+      },
+      "lossiness": "context_dependent",
+      "constraints": ["animation_not_supported", "supports_transparency"]
+    },
+    {
+      "id": "heic",
+      "label": "HEIC/HEIF",
+      "category": "image",
+      "extensions": [".heic", ".heif"],
+      "mimeTypes": ["image/heic", "image/heif", "image/heic-sequence", "image/heif-sequence"],
+      "preferredExtension": ".heic",
+      "preferredMimeType": "image/heic",
+      "processorNames": ["HEIC", "HEIF"],
+      "implemented": true,
+      "executionModes": ["server"],
+      "operationModes": {"inspectMetadata": ["server"], "convert": ["server"]},
+      "capabilities": {"inspectMetadata": true, "removeMetadata": false, "merge": false, "split": false, "quality": false, "compression": false, "resize": true, "multiFile": false},
+      "lossiness": "context_dependent",
+      "constraints": ["may_contain_sequences", "codec_support_required"]
+    },
+    {
+      "id": "avif",
+      "label": "AVIF",
+      "category": "image",
+      "extensions": [".avif"],
+      "mimeTypes": ["image/avif"],
+      "preferredExtension": ".avif",
+      "preferredMimeType": "image/avif",
+      "processorNames": ["AVIF"],
+      "implemented": true,
+      "executionModes": ["server"],
+      "operationModes": {"inspectMetadata": ["server"], "convert": ["server"]},
+      "capabilities": {"inspectMetadata": true, "removeMetadata": false, "merge": false, "split": false, "quality": true, "compression": true, "resize": true, "multiFile": false},
+      "lossiness": "context_dependent",
+      "constraints": ["may_contain_animation", "codec_support_required"]
+    },
+    {
+      "id": "gif",
+      "label": "GIF",
+      "category": "image",
+      "extensions": [".gif"],
+      "mimeTypes": ["image/gif"],
+      "preferredExtension": ".gif",
+      "preferredMimeType": "image/gif",
+      "processorNames": ["GIF"],
+      "implemented": true,
+      "executionModes": ["server"],
+      "operationModes": {"inspectMetadata": ["server"], "convert": ["server"]},
+      "capabilities": {"inspectMetadata": true, "removeMetadata": false, "merge": false, "split": false, "quality": false, "compression": true, "resize": true, "multiFile": false},
+      "lossiness": "lossless",
+      "constraints": ["may_contain_animation", "indexed_color"]
+    },
+    {
+      "id": "pdf", "label": "PDF", "category": "pdf", "extensions": [".pdf"], "mimeTypes": ["application/pdf"], "preferredExtension": ".pdf", "preferredMimeType": "application/pdf", "processorNames": ["PDF"], "implemented": true, "executionModes": ["server"],
+      "operationModes": {"inspectMetadata": ["server"], "removeMetadata": ["server"], "merge": ["server"], "split": ["server"], "convert": ["server"]},
+      "capabilities": {"inspectMetadata": true, "removeMetadata": true, "merge": true, "split": true, "quality": false, "compression": true, "resize": false, "multiFile": true}, "lossiness": "context_dependent", "constraints": ["encrypted_files_rejected", "metadata_removal_is_not_redaction", "rasterization_is_lossy"]
+    },
+    {
+      "id": "docx", "label": "DOCX", "category": "document", "extensions": [".docx"], "mimeTypes": ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"], "preferredExtension": ".docx", "preferredMimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "processorNames": ["DOCX"], "implemented": true, "executionModes": ["server"],
+      "operationModes": {"convert": ["server"], "inspectMetadata": ["server"], "removeMetadata": ["server"]}, "capabilities": {"inspectMetadata": true, "removeMetadata": true, "merge": false, "split": false, "quality": false, "compression": false, "resize": false, "multiFile": false}, "lossiness": "context_dependent", "constraints": ["may_contain_macros_or_external_links", "layout_may_change"]
+    },
+    {
+      "id": "doc", "label": "DOC", "category": "document", "extensions": [".doc"], "mimeTypes": ["application/msword"], "preferredExtension": ".doc", "preferredMimeType": "application/msword", "processorNames": ["DOC"], "implemented": true, "executionModes": ["server"],
+      "operationModes": {"convert": ["server"]}, "capabilities": {"inspectMetadata": false, "removeMetadata": false, "merge": false, "split": false, "quality": false, "compression": false, "resize": false, "multiFile": false}, "lossiness": "context_dependent", "constraints": ["legacy_binary_format", "may_contain_macros"]
+    },
+    {
+      "id": "odt", "label": "ODT", "category": "document", "extensions": [".odt"], "mimeTypes": ["application/vnd.oasis.opendocument.text"], "preferredExtension": ".odt", "preferredMimeType": "application/vnd.oasis.opendocument.text", "processorNames": ["ODT"], "implemented": true, "executionModes": ["server"],
+      "operationModes": {"convert": ["server"], "inspectMetadata": ["server"], "removeMetadata": ["server"]}, "capabilities": {"inspectMetadata": true, "removeMetadata": true, "merge": false, "split": false, "quality": false, "compression": false, "resize": false, "multiFile": false}, "lossiness": "context_dependent", "constraints": ["layout_may_change"]
+    },
+    {
+      "id": "rtf", "label": "RTF", "category": "document", "extensions": [".rtf"], "mimeTypes": ["application/rtf", "text/rtf"], "preferredExtension": ".rtf", "preferredMimeType": "application/rtf", "processorNames": ["RTF"], "implemented": true, "executionModes": ["server"],
+      "operationModes": {"convert": ["server"]}, "capabilities": {"inspectMetadata": false, "removeMetadata": false, "merge": false, "split": false, "quality": false, "compression": false, "resize": false, "multiFile": false}, "lossiness": "context_dependent", "constraints": ["formatting_support_varies"]
+    },
+    {
+      "id": "txt", "label": "Plain text", "category": "text", "extensions": [".txt"], "mimeTypes": ["text/plain"], "preferredExtension": ".txt", "preferredMimeType": "text/plain", "processorNames": ["TXT"], "implemented": true, "executionModes": ["server"],
+      "operationModes": {"convert": ["server"]}, "capabilities": {"inspectMetadata": false, "removeMetadata": false, "merge": false, "split": false, "quality": false, "compression": false, "resize": false, "multiFile": false}, "lossiness": "lossless", "constraints": ["encoding_must_be_detected"]
+    },
+    {
+      "id": "markdown", "label": "Markdown", "category": "text", "extensions": [".md", ".markdown"], "mimeTypes": ["text/markdown"], "preferredExtension": ".md", "preferredMimeType": "text/markdown", "processorNames": ["MARKDOWN", "MD"], "implemented": true, "executionModes": ["server"],
+      "operationModes": {"convert": ["server"]}, "capabilities": {"inspectMetadata": false, "removeMetadata": false, "merge": false, "split": false, "quality": false, "compression": false, "resize": false, "multiFile": false}, "lossiness": "lossless", "constraints": ["dialects_vary"]
+    },
+    {
+      "id": "html", "label": "HTML", "category": "document", "extensions": [".html", ".htm"], "mimeTypes": ["text/html"], "preferredExtension": ".html", "preferredMimeType": "text/html", "processorNames": ["HTML", "HTM"], "implemented": true, "executionModes": ["server"],
+      "operationModes": {"convert": ["server"]}, "capabilities": {"inspectMetadata": false, "removeMetadata": false, "merge": false, "split": false, "quality": false, "compression": false, "resize": false, "multiFile": false}, "lossiness": "context_dependent", "constraints": ["active_content_must_be_treated_as_untrusted", "external_resources"]
+    },
+    {
+      "id": "xlsx", "label": "XLSX", "category": "spreadsheet", "extensions": [".xlsx"], "mimeTypes": ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"], "preferredExtension": ".xlsx", "preferredMimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "processorNames": ["XLSX"], "implemented": true, "executionModes": ["server"],
+      "operationModes": {"convert": ["server"], "inspectMetadata": ["server"], "removeMetadata": ["server"]}, "capabilities": {"inspectMetadata": true, "removeMetadata": true, "merge": false, "split": false, "quality": false, "compression": false, "resize": false, "multiFile": true}, "lossiness": "context_dependent", "constraints": ["formulas", "multiple_sheets", "may_contain_macros_or_external_links"]
+    },
+    {
+      "id": "xls", "label": "XLS", "category": "spreadsheet", "extensions": [".xls"], "mimeTypes": ["application/vnd.ms-excel"], "preferredExtension": ".xls", "preferredMimeType": "application/vnd.ms-excel", "processorNames": ["XLS"], "implemented": true, "executionModes": ["server"],
+      "operationModes": {"convert": ["server"]}, "capabilities": {"inspectMetadata": false, "removeMetadata": false, "merge": false, "split": false, "quality": false, "compression": false, "resize": false, "multiFile": true}, "lossiness": "context_dependent", "constraints": ["legacy_binary_format", "formulas", "may_contain_macros"]
+    },
+    {
+      "id": "ods", "label": "ODS", "category": "spreadsheet", "extensions": [".ods"], "mimeTypes": ["application/vnd.oasis.opendocument.spreadsheet"], "preferredExtension": ".ods", "preferredMimeType": "application/vnd.oasis.opendocument.spreadsheet", "processorNames": ["ODS"], "implemented": true, "executionModes": ["server"],
+      "operationModes": {"convert": ["server"], "inspectMetadata": ["server"], "removeMetadata": ["server"]}, "capabilities": {"inspectMetadata": true, "removeMetadata": true, "merge": false, "split": false, "quality": false, "compression": false, "resize": false, "multiFile": true}, "lossiness": "context_dependent", "constraints": ["formulas", "multiple_sheets"]
+    },
+    {
+      "id": "csv", "label": "CSV", "category": "spreadsheet", "extensions": [".csv"], "mimeTypes": ["text/csv", "application/csv"], "preferredExtension": ".csv", "preferredMimeType": "text/csv", "processorNames": ["CSV"], "implemented": true, "executionModes": ["server"],
+      "operationModes": {"convert": ["server"]}, "capabilities": {"inspectMetadata": false, "removeMetadata": false, "merge": false, "split": false, "quality": false, "compression": false, "resize": false, "multiFile": false}, "lossiness": "context_dependent", "constraints": ["delimiter_and_encoding_vary", "single_table_only", "formulas_not_preserved"]
+    },
+    {
+      "id": "pptx", "label": "PPTX", "category": "presentation", "extensions": [".pptx"], "mimeTypes": ["application/vnd.openxmlformats-officedocument.presentationml.presentation"], "preferredExtension": ".pptx", "preferredMimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation", "processorNames": ["PPTX"], "implemented": true, "executionModes": ["server"],
+      "operationModes": {"convert": ["server"], "inspectMetadata": ["server"], "removeMetadata": ["server"]}, "capabilities": {"inspectMetadata": true, "removeMetadata": true, "merge": false, "split": false, "quality": false, "compression": false, "resize": false, "multiFile": false}, "lossiness": "context_dependent", "constraints": ["animations_and_transitions", "may_contain_macros_or_external_links"]
+    },
+    {
+      "id": "ppt", "label": "PPT", "category": "presentation", "extensions": [".ppt"], "mimeTypes": ["application/vnd.ms-powerpoint"], "preferredExtension": ".ppt", "preferredMimeType": "application/vnd.ms-powerpoint", "processorNames": ["PPT"], "implemented": true, "executionModes": ["server"],
+      "operationModes": {"convert": ["server"]}, "capabilities": {"inspectMetadata": false, "removeMetadata": false, "merge": false, "split": false, "quality": false, "compression": false, "resize": false, "multiFile": false}, "lossiness": "context_dependent", "constraints": ["legacy_binary_format", "animations_and_transitions", "may_contain_macros"]
+    },
+    {
+      "id": "odp", "label": "ODP", "category": "presentation", "extensions": [".odp"], "mimeTypes": ["application/vnd.oasis.opendocument.presentation"], "preferredExtension": ".odp", "preferredMimeType": "application/vnd.oasis.opendocument.presentation", "processorNames": ["ODP"], "implemented": true, "executionModes": ["server"],
+      "operationModes": {"convert": ["server"], "inspectMetadata": ["server"], "removeMetadata": ["server"]}, "capabilities": {"inspectMetadata": true, "removeMetadata": true, "merge": false, "split": false, "quality": false, "compression": false, "resize": false, "multiFile": false}, "lossiness": "context_dependent", "constraints": ["animations_and_transitions", "layout_may_change"]
+    }
+  ],
+  "conversions": [
+    {"source": "jpeg", "target": "jpeg", "executionModes": ["local", "server"], "lossiness": "typically_lossy"},
+    {"source": "jpeg", "target": "png", "executionModes": ["local", "server"], "lossiness": "context_dependent"},
+    {"source": "jpeg", "target": "webp", "executionModes": ["local", "server"], "lossiness": "typically_lossy"},
+    {"source": "png", "target": "jpeg", "executionModes": ["local", "server"], "lossiness": "typically_lossy", "constraints": ["transparency_is_flattened"]},
+    {"source": "png", "target": "png", "executionModes": ["local", "server"], "lossiness": "lossless"},
+    {"source": "png", "target": "webp", "executionModes": ["local", "server"], "lossiness": "context_dependent"},
+    {"source": "webp", "target": "jpeg", "executionModes": ["local", "server"], "lossiness": "typically_lossy", "constraints": ["transparency_is_flattened", "animation_not_supported"]},
+    {"source": "webp", "target": "png", "executionModes": ["local", "server"], "lossiness": "context_dependent", "constraints": ["animation_not_supported"]},
+    {"source": "webp", "target": "webp", "executionModes": ["local", "server"], "lossiness": "context_dependent", "constraints": ["animation_not_supported"]},
+    {"source": "heic", "target": "jpeg", "executionModes": ["server"], "lossiness": "typically_lossy"},
+    {"source": "heic", "target": "png", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "heic", "target": "webp", "executionModes": ["server"], "lossiness": "typically_lossy"},
+    {"source": "avif", "target": "jpeg", "executionModes": ["server"], "lossiness": "typically_lossy"},
+    {"source": "avif", "target": "png", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "avif", "target": "webp", "executionModes": ["server"], "lossiness": "typically_lossy"},
+    {"source": "jpeg", "target": "avif", "executionModes": ["server"], "lossiness": "typically_lossy"},
+    {"source": "png", "target": "avif", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "webp", "target": "avif", "executionModes": ["server"], "lossiness": "context_dependent", "constraints": ["animation_not_supported"]},
+    {"source": "gif", "target": "jpeg", "executionModes": ["server"], "lossiness": "typically_lossy", "constraints": ["static_only"]},
+    {"source": "gif", "target": "png", "executionModes": ["server"], "lossiness": "lossless", "constraints": ["static_only"]},
+    {"source": "gif", "target": "webp", "executionModes": ["server"], "lossiness": "context_dependent", "constraints": ["static_only"]},
+    {"source": "jpeg", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "png", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "webp", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent", "constraints": ["animation_not_supported"]},
+    {"source": "heic", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent", "constraints": ["static_only"]},
+    {"source": "avif", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent", "constraints": ["static_only"]},
+    {"source": "pdf", "target": "jpeg", "executionModes": ["server"], "lossiness": "typically_lossy", "constraints": ["rasterization"]},
+    {"source": "pdf", "target": "png", "executionModes": ["server"], "lossiness": "context_dependent", "constraints": ["rasterization"]},
+    {"source": "pdf", "target": "webp", "executionModes": ["server"], "lossiness": "context_dependent", "constraints": ["rasterization"]},
+    {"source": "docx", "target": "txt", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "docx", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "docx", "target": "odt", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "doc", "target": "docx", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "doc", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "odt", "target": "docx", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "odt", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "rtf", "target": "docx", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "rtf", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "txt", "target": "docx", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "txt", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "markdown", "target": "html", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "markdown", "target": "docx", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "markdown", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "html", "target": "txt", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "xlsx", "target": "csv", "executionModes": ["server"], "lossiness": "context_dependent", "constraints": ["multi_sheet_zip"]},
+    {"source": "xls", "target": "csv", "executionModes": ["server"], "lossiness": "context_dependent", "constraints": ["multi_sheet_zip"]},
+    {"source": "ods", "target": "csv", "executionModes": ["server"], "lossiness": "context_dependent", "constraints": ["multi_sheet_zip"]},
+    {"source": "csv", "target": "xlsx", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "csv", "target": "ods", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "xls", "target": "xlsx", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "xlsx", "target": "ods", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "ods", "target": "xlsx", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "xls", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "xlsx", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "ods", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "ppt", "target": "pptx", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "ppt", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "pptx", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "odp", "target": "pdf", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "pptx", "target": "odp", "executionModes": ["server"], "lossiness": "context_dependent"},
+    {"source": "odp", "target": "pptx", "executionModes": ["server"], "lossiness": "context_dependent"}
+  ]
+}

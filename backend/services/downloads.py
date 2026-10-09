@@ -28,6 +28,13 @@ def validate_download_url(url: str, allowed_hosts: tuple[str, ...] | None = None
     parsed = urlparse(url)
     if parsed.scheme != "https":
         raise DownloadError("Download URL must use HTTPS.")
+    if parsed.username is not None or parsed.password is not None:
+        raise DownloadError("Download URL credentials are not allowed.")
+    try:
+        if parsed.port not in (None, 443):
+            raise DownloadError("Download URL must use the standard HTTPS port.")
+    except ValueError as exc:
+        raise DownloadError("Download URL has an invalid port.") from exc
     host = (parsed.hostname or "").lower()
     if not is_allowed_download_host(host, allowed_hosts):
         raise DownloadError(f"Disallowed download host: {host or '[missing]'}")

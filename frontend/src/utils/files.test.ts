@@ -11,6 +11,8 @@ describe('file presentation helpers', () => {
   it('creates safe local output filenames', () => {
     expect(safeOutputFilename('../private/photo?.png', 'jpg')).toBe('photo_.jpg')
     expect(safeOutputFilename('portrait.jpeg', 'jpg', '-clean')).toBe('portrait-clean.jpg')
+    expect(safeOutputFilename('portrait.jpeg', 'jpeg')).toBe('portrait.jpg')
+    expect(() => safeOutputFilename('clip.mp4', 'mp4')).toThrow('Unsupported output extension')
   })
 
   it('describes output-size differences', () => {

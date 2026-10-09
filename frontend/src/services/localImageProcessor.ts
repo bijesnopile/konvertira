@@ -17,6 +17,7 @@ import {
   validateLocalImageDescriptor,
   validatePixelCount,
 } from '../utils/fileValidation'
+import { conversionCapability } from '../formats/registry'
 
 export const JPEG_BACKGROUND_COLOR = '#ffffff'
 
@@ -29,6 +30,45 @@ interface DecodedImage {
 
 export function qualityPercentToCanvas(qualityPercent = 90): number {
   return Math.min(100, Math.max(10, qualityPercent)) / 100
+}
+
+export function calculateLocalResizeDimensions(
+  originalWidth: number,
+  originalHeight: number,
+  options: Pick<LocalImageProcessOptions, 'width' | 'height' | 'scalePercent' | 'preserveAspectRatio' | 'allowUpscale'>,
+): { width: number; height: number } {
+  if (options.scalePercent !== undefined && (options.width !== undefined || options.height !== undefined)) {
+    throw new LocalImageProcessingError('Use either percentage resize or width/height, not both.')
+  }
+  let width = originalWidth
+  let height = originalHeight
+  if (options.scalePercent !== undefined) {
+    if (options.scalePercent < 1 || options.scalePercent > 1000) {
+      throw new LocalImageProcessingError('Resize percentage must be between 1 and 1000.')
+    }
+    width = Math.max(1, Math.round(originalWidth * options.scalePercent / 100))
+    height = Math.max(1, Math.round(originalHeight * options.scalePercent / 100))
+  } else if (options.width !== undefined || options.height !== undefined) {
+    if ((options.width !== undefined && options.width <= 0) || (options.height !== undefined && options.height <= 0)) {
+      throw new LocalImageProcessingError('Resize dimensions must be positive integers.')
+    }
+    if (options.preserveAspectRatio !== false) {
+      const widthRatio = options.width === undefined ? Number.POSITIVE_INFINITY : options.width / originalWidth
+      const heightRatio = options.height === undefined ? Number.POSITIVE_INFINITY : options.height / originalHeight
+      const ratio = Math.min(widthRatio, heightRatio)
+      width = Math.max(1, Math.round(originalWidth * ratio))
+      height = Math.max(1, Math.round(originalHeight * ratio))
+    } else {
+      width = options.width ?? originalWidth
+      height = options.height ?? originalHeight
+    }
+  }
+  if (!options.allowUpscale && (width > originalWidth || height > originalHeight)) {
+    width = originalWidth
+    height = originalHeight
+  }
+  validatePixelCount(width, height)
+  return { width, height }
 }
 
 export async function getImageInfo(file: File): Promise<LocalImageInfo> {
@@ -62,26 +102,33 @@ export async function processImageLocally(
     ? inputFormat
     : options.outputFormat
   if (!outputFormat) {
-    throw new LocalImageProcessingError('Choose an output format before processing.')
+    throw new LocalImageProcessingError('Choose an output format before processing.', 'unsupported_conversion')
+  }
+  if (options.action === 'convert-image' && !conversionCapability(inputFormat, outputFormat, 'local')) {
+    throw new LocalImageProcessingError(
+      `Conversion from ${inputFormat.toUpperCase()} to ${outputFormat.toUpperCase()} is not supported locally.`,
+      'unsupported_conversion',
+    )
   }
 
   const decoded = await decodeImage(file)
   let canvas: HTMLCanvasElement | undefined
   try {
     validatePixelCount(decoded.width, decoded.height)
+    const outputDimensions = calculateLocalResizeDimensions(decoded.width, decoded.height, options)
     canvas = document.createElement('canvas')
-    canvas.width = decoded.width
-    canvas.height = decoded.height
+    canvas.width = outputDimensions.width
+    canvas.height = outputDimensions.height
     const context = canvas.getContext('2d', { alpha: !requiresOpaqueBackground(outputFormat) })
     if (!context) {
       throw new LocalImageProcessingError('Your browser could not start the local image processor.')
     }
 
     if (requiresOpaqueBackground(outputFormat)) {
-      context.fillStyle = JPEG_BACKGROUND_COLOR
+      context.fillStyle = options.backgroundColor || JPEG_BACKGROUND_COLOR
       context.fillRect(0, 0, canvas.width, canvas.height)
     }
-    context.drawImage(decoded.source, 0, 0, decoded.width, decoded.height)
+    context.drawImage(decoded.source, 0, 0, outputDimensions.width, outputDimensions.height)
 
     const mimeType = mimeTypeForFormat(outputFormat)
     const blob = await canvasToBlob(
@@ -92,6 +139,7 @@ export async function processImageLocally(
     if (blob.type && blob.type !== mimeType) {
       throw new LocalImageProcessingError(
         `Your browser does not support creating ${outputFormat.toUpperCase()} images.`,
+        'unsupported_feature',
       )
     }
 
@@ -105,8 +153,8 @@ export async function processImageLocally(
       mimeType,
       format: outputFormat,
       size: blob.size,
-      width: decoded.width,
-      height: decoded.height,
+      width: outputDimensions.width,
+      height: outputDimensions.height,
       processingMode: 'local',
     }
   } catch (error) {
