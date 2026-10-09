@@ -34,7 +34,7 @@ export function DocumentConverter() {
   return <section className="px-5 pb-24 sm:px-8 lg:px-10"><div className="mx-auto max-w-4xl rounded-3xl border border-black/[0.08] bg-white p-6 shadow-card sm:p-8">
     <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-xl font-semibold text-ink">Document converter</h2><p className="mt-1 text-sm text-slate-500">DOCX, DOC, ODT, RTF, TXT, Markdown and HTML</p></div><ProcessingModeBadge mode="server" /></div>
     <ProcessingModeInfo mode="server" title="Server conversion" description="The document is uploaded only when you start conversion. Complex layouts, fonts, macros and embedded objects may change or be omitted." className="mt-5 p-4" />
-    <input type="file" accept=".docx,.doc,.odt,.rtf,.txt,.md,.markdown,.html,.htm" onChange={choose} className="mt-5 block w-full text-sm" />
+    <input type="file" accept=".docx,.doc,.odt,.rtf,.txt,.md,.markdown,.html,.htm" onChange={choose} className="file-picker mt-5" />
     {file && available.length > 0 && <label className="mt-4 block text-sm font-semibold">Output format<select value={output} onChange={(event) => setOutput(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-300 p-3">{available.map((value) => <option key={value}>{value.toUpperCase()}</option>)}</select></label>}
     <button type="button" disabled={!file || !output || loading} onClick={() => void run()} className="button-primary mt-5 w-full">{loading ? 'Converting on the server…' : 'Convert document'}</button>
     {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}

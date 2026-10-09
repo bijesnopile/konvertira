@@ -32,7 +32,7 @@ export function MetadataPrivacyTool() {
   return <section className="px-5 pb-24 sm:px-8 lg:px-10"><div className="mx-auto max-w-4xl rounded-3xl border border-black/[0.08] bg-white p-6 shadow-card sm:p-8">
     <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-xl font-semibold text-ink">Metadata inspector and privacy tools</h2><p className="mt-1 text-sm text-slate-500">See common location, identity, timestamp and software fields</p></div><ProcessingModeBadge mode="server" /></div>
     <ProcessingModeInfo mode="server" title="Server inspection for mixed file formats" description="This unified inspector uploads the selected file only after you choose an action. The image cleaner on the Convert page remains a separate local workflow." className="mt-5 p-4" />
-    <input type="file" accept=".jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.pdf,.docx,.odt,.xlsx,.ods,.pptx,.odp" onChange={choose} className="mt-5 block w-full text-sm" />
+    <input type="file" accept=".jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.pdf,.docx,.odt,.xlsx,.ods,.pptx,.odp" onChange={choose} className="file-picker mt-5" />
     <div className="mt-5 grid gap-3 sm:grid-cols-2"><button type="button" disabled={!file || loading} onClick={() => void inspect()} className="button-secondary">Inspect metadata</button><button type="button" disabled={!file || loading || !canRemove} onClick={() => void remove()} className="button-primary">Remove supported metadata</button></div>
     {file && !canRemove && <p className="mt-3 text-xs text-slate-500">Inspection is available, but metadata removal is not implemented for this format.</p>}
     {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}

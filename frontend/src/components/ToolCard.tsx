@@ -150,7 +150,7 @@ export function ToolCard() {
                 {!inspecting && (
                   <>
                     <p className="mt-1 text-sm text-slate-500">or</p>
-                    <button type="button" className="button-secondary mt-4" onClick={() => inputRef.current?.click()}>Browse files</button>
+                    <button type="button" className="button-file mt-4" onClick={() => inputRef.current?.click()}>Browse files</button>
                   </>
                 )}
                 <p className="mt-5 text-xs leading-5 text-slate-500">JPG, JPEG, PNG or WEBP · Up to {LOCAL_IMAGE_LIMITS.maxSizeMb} MB<br />Static images only</p>

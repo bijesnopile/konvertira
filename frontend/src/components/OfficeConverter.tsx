@@ -33,7 +33,7 @@ export function OfficeConverter() {
   return <section className="px-5 pb-24 sm:px-8 lg:px-10"><div className="mx-auto max-w-4xl rounded-3xl border border-black/[0.08] bg-white p-6 shadow-card sm:p-8">
     <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-xl font-semibold text-ink">Spreadsheet and presentation converter</h2><p className="mt-1 text-sm text-slate-500">XLSX, XLS, ODS, CSV, PPTX, PPT and ODP</p></div><ProcessingModeBadge mode="server" /></div>
     <ProcessingModeInfo mode="server" title="Server conversion" description="Office conversion uses an isolated, time-limited LibreOffice process. Uploaded files are treated as untrusted and macros are not deliberately executed." className="mt-5 p-4" />
-    <input type="file" accept=".xlsx,.xls,.ods,.csv,.pptx,.ppt,.odp" onChange={choose} className="mt-5 block w-full text-sm" />
+    <input type="file" accept=".xlsx,.xls,.ods,.csv,.pptx,.ppt,.odp" onChange={choose} className="file-picker mt-5" />
     {options.length > 0 && <label className="mt-4 block text-sm font-semibold">Output format<select value={output} onChange={(event) => setOutput(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-300 p-3">{options.map((value) => <option key={value}>{value.toUpperCase()}</option>)}</select></label>}
     <button type="button" disabled={!file || !output || loading} onClick={() => void run()} className="button-primary mt-5 w-full">{loading ? 'Converting on the server…' : 'Convert file'}</button>
     {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}

@@ -68,7 +68,7 @@ export function ServerImageConverter() {
         </div>
         <ProcessingModeInfo mode="server" title="Upload required" description="Selecting Process uploads this file to Konvertira for temporary server-side conversion. There is no automatic upload or fallback from the local tool." className="mt-5 p-4" />
         <input ref={inputRef} type="file" accept={SERVER_INPUT_ACCEPT} onChange={chooseFile} className="sr-only" />
-        <button type="button" onClick={() => inputRef.current?.click()} className="button-secondary mt-5">{file ? 'Choose another file' : 'Choose a supported image'}</button>
+        <button type="button" onClick={() => inputRef.current?.click()} className="button-file mt-5">{file ? 'Choose another file' : 'Choose a supported image'}</button>
         {file && <p className="mt-3 text-sm text-slate-600">{file.name} · {formatBytes(file.size)}</p>}
         <div className="mt-5 flex flex-wrap gap-3">
           {outputs.map((output) => <button type="button" key={output} onClick={() => setFormat(output)} className={format === output ? 'button-primary' : 'button-secondary'}>{output.toUpperCase()}</button>)}
