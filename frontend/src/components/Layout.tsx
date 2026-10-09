@@ -31,6 +31,8 @@ export function Layout() {
     document.querySelector<HTMLMetaElement>('meta[name="description"]')?.setAttribute('content', metadata.description)
     document.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.setAttribute('content', metadata.title)
     document.querySelector<HTMLMetaElement>('meta[property="og:description"]')?.setAttribute('content', metadata.description)
+    document.querySelector<HTMLMetaElement>('meta[name="twitter:title"]')?.setAttribute('content', metadata.title)
+    document.querySelector<HTMLMetaElement>('meta[name="twitter:description"]')?.setAttribute('content', metadata.description)
     const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')
     canonical?.setAttribute('href', `https://konvertira.com${pathname === '/' ? '/' : pathname}`)
     document.querySelector<HTMLMetaElement>('meta[property="og:url"]')?.setAttribute('content', canonical?.href ?? 'https://konvertira.com/')
