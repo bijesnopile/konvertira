@@ -60,6 +60,7 @@ def test_tool_registration_schemas_and_annotations() -> None:
         "remove_image_metadata", "convert_image", "inspect_file_metadata",
         "remove_file_metadata", "merge_pdfs", "extract_pdf_pages",
         "split_pdf", "reorder_pdf_pages", "delete_pdf_pages", "optimize_pdf",
+        "remove_image_background",
         "convert_pdf_to_images", "convert_images_to_pdf", "convert_document",
         "convert_spreadsheet", "convert_presentation",
     }
@@ -78,6 +79,10 @@ def test_tool_registration_schemas_and_annotations() -> None:
         assert tools[name].meta["openai/fileParams"] == ["file"]
     target_size = tools["convert_image"].input_schema["properties"]["target_size_bytes"]
     assert target_size["anyOf"][0]["minimum"] == 1024
+    background = tools["remove_image_background"]
+    assert background.annotations == tools["split_pdf"].annotations
+    assert background.meta["openai/fileParams"] == ["file"]
+    assert background.input_schema["properties"]["output_format"]["default"] == "png"
 
 
 def test_unsupported_conversion_rejects_before_download(monkeypatch) -> None:

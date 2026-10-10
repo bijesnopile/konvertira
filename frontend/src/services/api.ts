@@ -2,6 +2,10 @@ import type { MetadataInspection, OutputFormat, ProcessedFile, ServerImageConver
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
 
+export function removeImageBackground(file: File, outputFormat: 'png' | 'webp' = 'png'): Promise<ProcessedFile> {
+  return postFile('/images/remove-background', file, `background-removed.${outputFormat}`, { output_format: outputFormat })
+}
+
 export class ApiError extends Error {
   readonly status?: number
 

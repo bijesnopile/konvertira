@@ -1,5 +1,10 @@
 # Konvertira
 
+Server-side image background removal is available in the web image tools and MCP.
+It creates transparent PNG/WebP using local automated segmentation and temporary
+processing. Complex edges may need refinement; it does not guarantee anonymity
+or remove visible sensitive information. See [deployment and model requirements](docs/background-removal.md).
+
 Konvertira is an independently operated, privacy-focused file conversion and metadata-cleaning project. It has three applications sharing the same processors and declarative format registry:
 
 - `frontend/` — React, TypeScript, Vite, and Tailwind CSS.

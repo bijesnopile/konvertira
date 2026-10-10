@@ -26,3 +26,4 @@ backups/
 *.pfx
 *.jks
 *.keystore
+models/

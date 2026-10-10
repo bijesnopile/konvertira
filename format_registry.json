@@ -12,7 +12,7 @@
       "processorNames": ["JPEG", "JPG"],
       "implemented": true,
       "executionModes": ["local", "server"],
-      "operationModes": {"inspectMetadata": ["server"], "removeMetadata": ["local", "server"], "convert": ["local", "server"]},
+      "operationModes": {"inspectMetadata": ["server"], "removeMetadata": ["local", "server"], "convert": ["local", "server"], "removeBackground": ["server"]},
       "capabilities": {
         "inspectMetadata": true,
         "removeMetadata": true,
@@ -37,7 +37,7 @@
       "processorNames": ["PNG"],
       "implemented": true,
       "executionModes": ["local", "server"],
-      "operationModes": {"inspectMetadata": ["server"], "removeMetadata": ["local", "server"], "convert": ["local", "server"]},
+      "operationModes": {"inspectMetadata": ["server"], "removeMetadata": ["local", "server"], "convert": ["local", "server"], "removeBackground": ["server"]},
       "capabilities": {
         "inspectMetadata": true,
         "removeMetadata": true,
@@ -62,7 +62,7 @@
       "processorNames": ["WEBP"],
       "implemented": true,
       "executionModes": ["local", "server"],
-      "operationModes": {"inspectMetadata": ["server"], "removeMetadata": ["local", "server"], "convert": ["local", "server"]},
+      "operationModes": {"inspectMetadata": ["server"], "removeMetadata": ["local", "server"], "convert": ["local", "server"], "removeBackground": ["server"]},
       "capabilities": {
         "inspectMetadata": true,
         "removeMetadata": true,
@@ -87,7 +87,7 @@
       "processorNames": ["HEIC", "HEIF"],
       "implemented": true,
       "executionModes": ["server"],
-      "operationModes": {"inspectMetadata": ["server"], "convert": ["server"]},
+      "operationModes": {"inspectMetadata": ["server"], "convert": ["server"], "removeBackground": ["server"]},
       "capabilities": {"inspectMetadata": true, "removeMetadata": false, "merge": false, "split": false, "quality": false, "compression": false, "resize": true, "multiFile": false},
       "lossiness": "context_dependent",
       "constraints": ["may_contain_sequences", "codec_support_required"]
@@ -103,7 +103,7 @@
       "processorNames": ["AVIF"],
       "implemented": true,
       "executionModes": ["server"],
-      "operationModes": {"inspectMetadata": ["server"], "convert": ["server"]},
+      "operationModes": {"inspectMetadata": ["server"], "convert": ["server"], "removeBackground": ["server"]},
       "capabilities": {"inspectMetadata": true, "removeMetadata": false, "merge": false, "split": false, "quality": true, "compression": true, "resize": true, "multiFile": false},
       "lossiness": "context_dependent",
       "constraints": ["may_contain_animation", "codec_support_required"]
@@ -119,7 +119,7 @@
       "processorNames": ["GIF"],
       "implemented": true,
       "executionModes": ["server"],
-      "operationModes": {"inspectMetadata": ["server"], "convert": ["server"]},
+      "operationModes": {"inspectMetadata": ["server"], "convert": ["server"], "removeBackground": ["server"]},
       "capabilities": {"inspectMetadata": true, "removeMetadata": false, "merge": false, "split": false, "quality": false, "compression": true, "resize": true, "multiFile": false},
       "lossiness": "lossless",
       "constraints": ["may_contain_animation", "indexed_color"]

@@ -6,6 +6,7 @@ import asyncio
 from typing import Annotated
 
 from pydantic import Field
+from backend.processors.background_removal import BackgroundOutputFormat, WARNING as BACKGROUND_WARNING, remove_image_background as process_background
 
 from backend.processors.document import convert_document as process_document
 from backend.processors.image import convert_image as process_image
@@ -37,6 +38,21 @@ from konvertira_mcp.models.files import (
     SpreadsheetOutputFormat,
 )
 from konvertira_mcp.tools.common import McpWorkflowError, download_input, input_format, run_heavy, stored_result
+
+
+async def remove_image_background(
+    file: OpenAIFile,
+    output_format: BackgroundOutputFormat = BackgroundOutputFormat.PNG,
+) -> ProcessedResult:
+    async def operation() -> ProcessedResult:
+        definition = input_format(file)
+        if "server" not in definition.modes_for("removeBackground"):
+            raise McpWorkflowError("Background removal is not supported for this format.")
+        content = await download_input(file, settings.max_image_size)
+        result = await asyncio.to_thread(process_background, content, output_format=output_format, expected_format=definition.id)
+        return stored_result(result.content, output_format.value, file.file_name,
+                             f"The image background was removed and a new transparent {output_format.value.upper()} was created. {BACKGROUND_WARNING}")
+    return await run_heavy("remove_image_background", operation)
 
 
 async def convert_image(

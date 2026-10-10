@@ -8,7 +8,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.compat import cleanup_old_files, download_openai_file, remove_metadata
-from backend.routers import conversion, documents, downloads, health, metadata, office, pdf, privacy
+from backend.routers import background_removal, conversion, documents, downloads, health, metadata, office, pdf, privacy
 from backend.schemas import ActionRequest, ActionResponse, OpenAIFileRef
 from backend.services.security import api_key_header, verify_api_key
 from backend.services.storage import api_storage, cleanup_periodically
@@ -80,6 +80,7 @@ def create_app() -> FastAPI:
     application.include_router(health.router)
     application.include_router(metadata.router)
     application.include_router(conversion.router)
+    application.include_router(background_removal.router)
     application.include_router(downloads.router)
     application.include_router(pdf.router)
     application.include_router(documents.router)

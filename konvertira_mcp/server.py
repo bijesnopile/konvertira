@@ -30,6 +30,7 @@ from konvertira_mcp.tools.workflows import (
     optimize_pdf,
     reorder_pdf_pages,
     remove_file_metadata,
+    remove_image_background,
     split_pdf,
 )
 
@@ -98,6 +99,14 @@ _register_tool("split_pdf", "Split a PDF", "Split one unencrypted PDF into indiv
 _register_tool("reorder_pdf_pages", "Reorder PDF pages", "Create a new PDF from one unencrypted PDF using an explicit validated order such as 3,1,2. Every page must appear exactly once.", reorder_pdf_pages)
 _register_tool("delete_pdf_pages", "Delete PDF pages", "Create a new PDF from one unencrypted PDF excluding an explicit validated page selection such as 2,4-6. Deleting every page is rejected.", delete_pdf_pages)
 _register_tool("optimize_pdf", "Optimize a PDF", "Perform lossless structural optimization on one unencrypted PDF. This does not claim visual compression or image downsampling.", optimize_pdf)
+mcp.tool(
+    name="remove_image_background",
+    title="Remove image background",
+    description="Remove the visual background from one supported static image using server-side segmentation and return a new transparent PNG or WebP. Difficult edges, hair, fur, glass, shadows, or ambiguous scenes may require manual refinement.",
+    annotations=_COPY_ANNOTATIONS,
+    meta={"openai/fileParams": ["file"], "openai/toolInvocation/invoking": "Removing image background...", "openai/toolInvocation/invoked": "Background removed"},
+    structured_output=True,
+)(remove_image_background)
 _register_tool("convert_pdf_to_images", "Convert PDF pages to images", "Render bounded pages from one unencrypted PDF into a ZIP of PNG, JPEG, or WebP images. Rasterization is lossy.", convert_pdf_to_images)
 _register_tool("convert_images_to_pdf", "Convert images to PDF", "Create one PDF from 1 to 10 supported static images in the supplied order.", convert_images_to_pdf, file_params=("files",))
 _register_tool("convert_document", "Convert a document", "Convert one supported DOCX, DOC, ODT, RTF, TXT, Markdown, or HTML document using the explicit safe conversion matrix.", convert_document)

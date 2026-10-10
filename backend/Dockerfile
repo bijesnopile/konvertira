@@ -9,7 +9,7 @@ WORKDIR /app
 RUN addgroup --system konvertira && adduser --system --ingroup konvertira konvertira
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libreoffice-writer libreoffice-calc libreoffice-impress fonts-dejavu-core \
+    && apt-get install -y --no-install-recommends libreoffice-writer libreoffice-calc libreoffice-impress fonts-dejavu-core libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./
@@ -19,6 +19,11 @@ COPY config.py main.py mcp_server.py ./
 COPY format_registry.json ./
 COPY backend ./backend
 COPY konvertira_mcp ./konvertira_mcp
+COPY scripts/prepare_background_model.py ./scripts/prepare_background_model.py
+ENV BACKGROUND_MODEL_DIR=/opt/konvertira-models
+RUN python scripts/prepare_background_model.py
+COPY docs/licenses/U2NET-Apache-2.0.txt /opt/konvertira-models/LICENSE-U2NET.txt
+COPY docs/background-removal.md /opt/konvertira-models/ATTRIBUTION.md
 
 RUN mkdir -p /tmp/konvertira-results /tmp/konvertira-mcp-results \
     && chown -R konvertira:konvertira /app /tmp/konvertira-results /tmp/konvertira-mcp-results

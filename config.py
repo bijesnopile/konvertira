@@ -67,6 +67,10 @@ class Settings:
         default_factory=lambda: int(os.getenv("MAX_IMAGE_OUTPUT_SIZE", str(100 * 1024 * 1024)))
     )
     max_pixels: int = field(default_factory=lambda: int(os.getenv("MAX_PIXELS", "100000000")))
+    background_model_dir: Path = field(default_factory=lambda: _path("BACKGROUND_MODEL_DIR", Path(__file__).resolve().parent / "models"))
+    background_max_pixels: int = field(default_factory=lambda: int(os.getenv("BACKGROUND_MAX_PIXELS", "12000000")))
+    background_threads: int = field(default_factory=lambda: max(1, min(4, int(os.getenv("BACKGROUND_THREADS", "1")))))
+    background_timeout_seconds: float = field(default_factory=lambda: float(os.getenv("BACKGROUND_TIMEOUT_SECONDS", "60")))
     image_target_size_attempts: int = field(
         default_factory=lambda: min(
             10,

@@ -26,7 +26,7 @@ export interface FormatDefinition {
   processorNames: readonly string[]
   implemented: boolean
   executionModes: readonly ExecutionMode[]
-  operationModes?: Readonly<Record<string, readonly ExecutionMode[]>>
+  operationModes?: Readonly<Partial<Record<string, readonly ExecutionMode[]>>>
   capabilities: FormatCapabilities
   lossiness: Lossiness
   constraints: readonly string[]
