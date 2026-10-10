@@ -15,6 +15,12 @@ export function AboutPage() {
             <div>
               <h2 className="text-2xl font-semibold tracking-tight text-ink">Why Konvertira exists</h2>
               <p className="mt-4 leading-7 text-slate-600">Konvertira started as a side project by a student who was tired of simple file conversions being locked behind subscriptions, unnecessary sign-ups, or confusing limits.</p>
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <p className="leading-7 text-slate-600">Konvertira is developed by <span className="font-semibold text-ink">Matej Tokić</span>.</p>
+                <a href="https://x.com/t0kic_" target="_blank" rel="noopener noreferrer" aria-label="Matej Tokić on X" className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-ink transition-colors hover:bg-forest-50 hover:text-forest-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-500 focus-visible:ring-offset-2">
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.64 7.584H.47l8.6-9.835L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" /></svg>
+                </a>
+              </div>
               <p className="mt-4 leading-7 text-slate-600">Today it includes local JPG, PNG, and static WEBP workflows plus clearly labeled server tools for advanced images, PDFs, documents, spreadsheets, presentations, and supported metadata.</p>
               <p className="mt-4 leading-7 text-slate-600">The project is still small and independently operated. File, page, pixel, time, concurrency, and temporary-storage limits keep it practical on modest infrastructure while the service remains understandable and accessible.</p>
             </div>
