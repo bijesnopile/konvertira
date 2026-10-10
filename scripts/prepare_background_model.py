@@ -16,6 +16,7 @@ def main():
     directory.mkdir(parents=True, exist_ok=True)
     destination = directory / "u2netp.onnx"
     if destination.exists() and hashlib.sha256(destination.read_bytes()).hexdigest() == MODEL_SHA256:
+        destination.chmod(0o444)
         return
     temporary = None
     try:
@@ -26,10 +27,16 @@ def main():
             if len(content) > 10 * 1024 * 1024 or hashlib.sha256(content).hexdigest() != MODEL_SHA256:
                 raise RuntimeError("Model checksum/size verification failed")
             output.write(content)
+        # NamedTemporaryFile starts at 0600 on Linux. Set the verified artifact's
+        # final mode before atomic publication so non-root consumers can read it.
+        temporary.chmod(0o444)
         temporary.replace(destination)
         print(f"Prepared {destination} ({len(content)} bytes)")
     finally:
-        if temporary is not None:
+        if temporary is not None and temporary.exists():
+            # Allow cleanup of a verified read-only temporary file on Windows
+            # if publication failed; the published model stays read-only.
+            temporary.chmod(0o600)
             temporary.unlink(missing_ok=True)
 
 

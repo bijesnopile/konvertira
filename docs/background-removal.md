@@ -50,6 +50,27 @@ volume or new public port is needed. Build requires network access; processing
 requires none. Health endpoints remain independent of model initialization.
 Rebuild backend and MCP images before deploying this feature.
 
+The model directory stays root-owned with mode `0555`; model, license and
+attribution files have mode `0444`. The preparation script sets the verified
+model to `0444` before atomic publication and repairs the mode on cached models.
+After `USER konvertira`, the shared Dockerfile checks actual read/traverse access
+and absence of write access. Both backend and MCP builds fail if this regresses.
+The preparation script remains an operator/build step only.
+
+After rebuilding and recreating both services, run these smoke checks as their
+default runtime user (do not pass `--user root`):
+
+```sh
+docker compose build backend mcp
+docker compose up -d --force-recreate backend mcp
+docker compose exec -T backend python scripts/check_background_model_permissions.py
+docker compose exec -T mcp python scripts/check_background_model_permissions.py
+docker compose exec -T backend python -c "from backend.processors.background_removal import _get_session; print(_get_session().get_providers())"
+docker compose exec -T mcp python -c "from backend.processors.background_removal import _get_session; print(_get_session().get_providers())"
+docker compose exec -T backend python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2).read())"
+docker compose exec -T mcp python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=2).read())"
+```
+
 For non-Docker development, run `python scripts/prepare_background_model.py`
 from the repository root. Default directory is `models/` (ignored by Git).
 Set `BACKGROUND_MODEL_DIR` to a trusted operator-owned directory when needed;

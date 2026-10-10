@@ -20,15 +20,21 @@ COPY format_registry.json ./
 COPY backend ./backend
 COPY konvertira_mcp ./konvertira_mcp
 COPY scripts/prepare_background_model.py ./scripts/prepare_background_model.py
+COPY scripts/check_background_model_permissions.py ./scripts/check_background_model_permissions.py
 ENV BACKGROUND_MODEL_DIR=/opt/konvertira-models
 RUN python scripts/prepare_background_model.py
 COPY docs/licenses/U2NET-Apache-2.0.txt /opt/konvertira-models/LICENSE-U2NET.txt
 COPY docs/background-removal.md /opt/konvertira-models/ATTRIBUTION.md
 
+RUN chmod 0555 /opt/konvertira-models \
+    && chmod 0444 /opt/konvertira-models/*
+
 RUN mkdir -p /tmp/konvertira-results /tmp/konvertira-mcp-results \
     && chown -R konvertira:konvertira /app /tmp/konvertira-results /tmp/konvertira-mcp-results
 
 USER konvertira
+
+RUN python scripts/check_background_model_permissions.py
 
 EXPOSE 8000
 
