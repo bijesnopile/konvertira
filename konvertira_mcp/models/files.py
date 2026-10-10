@@ -1,7 +1,9 @@
 """MCP file input and structured output models."""
 
 from enum import StrEnum
-from pydantic import BaseModel, ConfigDict, HttpUrl
+from typing import Annotated
+
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, WithJsonSchema
 
 
 class OpenAIFile(BaseModel):
@@ -9,8 +11,14 @@ class OpenAIFile(BaseModel):
 
     download_url: HttpUrl
     file_id: str
-    mime_type: str | None = None
-    file_name: str | None = None
+    mime_type: Annotated[
+        str | None,
+        WithJsonSchema({"type": "string"}),
+    ] = Field(default_factory=lambda: None)
+    file_name: Annotated[
+        str | None,
+        WithJsonSchema({"type": "string"}),
+    ] = Field(default_factory=lambda: None)
 
 
 class ProcessedImage(BaseModel):
