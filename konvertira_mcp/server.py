@@ -23,10 +23,14 @@ from konvertira_mcp.tools.workflows import (
     convert_pdf_to_images,
     convert_presentation,
     convert_spreadsheet,
+    delete_pdf_pages,
     extract_pdf_file_pages,
     inspect_file_metadata,
     merge_pdf_files,
+    optimize_pdf,
+    reorder_pdf_pages,
     remove_file_metadata,
+    split_pdf,
 )
 
 mcp = MCPServer(
@@ -85,11 +89,15 @@ def _register_tool(name, title, description, function, *, inspect=False, file_pa
     )(function)
 
 
-_register_tool("convert_image", "Convert an image", "Convert one supported static image to JPEG, PNG, WebP, or AVIF with optional bounded resize settings. Animated images are rejected.", convert_image)
+_register_tool("convert_image", "Convert an image", "Convert one supported static image to JPEG, PNG, WebP, or AVIF with optional bounded resize, best-effort target-size, and JPEG transparency-background settings. Animated images are rejected.", convert_image)
 _register_tool("inspect_file_metadata", "Inspect file metadata", "Inspect supported image, PDF, OOXML, or ODF metadata. Results do not prove anonymity or absence of hidden content.", inspect_file_metadata, inspect=True)
 _register_tool("remove_file_metadata", "Remove supported file metadata", "Create a new supported image, PDF, OOXML, or ODF copy with metadata fields Konvertira knows how to remove.", remove_file_metadata)
 _register_tool("merge_pdfs", "Merge PDFs", "Merge 2 to 10 uploaded, unencrypted PDFs in the supplied order.", merge_pdf_files, file_params=("files",))
 _register_tool("extract_pdf_pages", "Extract PDF pages", "Extract a validated page selection such as 1-3,5 from one unencrypted PDF.", extract_pdf_file_pages)
+_register_tool("split_pdf", "Split a PDF", "Split one unencrypted PDF into individual page PDFs packaged in a ZIP archive with generated safe filenames.", split_pdf)
+_register_tool("reorder_pdf_pages", "Reorder PDF pages", "Create a new PDF from one unencrypted PDF using an explicit validated order such as 3,1,2. Every page must appear exactly once.", reorder_pdf_pages)
+_register_tool("delete_pdf_pages", "Delete PDF pages", "Create a new PDF from one unencrypted PDF excluding an explicit validated page selection such as 2,4-6. Deleting every page is rejected.", delete_pdf_pages)
+_register_tool("optimize_pdf", "Optimize a PDF", "Perform lossless structural optimization on one unencrypted PDF. This does not claim visual compression or image downsampling.", optimize_pdf)
 _register_tool("convert_pdf_to_images", "Convert PDF pages to images", "Render bounded pages from one unencrypted PDF into a ZIP of PNG, JPEG, or WebP images. Rasterization is lossy.", convert_pdf_to_images)
 _register_tool("convert_images_to_pdf", "Convert images to PDF", "Create one PDF from 1 to 10 supported static images in the supplied order.", convert_images_to_pdf, file_params=("files",))
 _register_tool("convert_document", "Convert a document", "Convert one supported DOCX, DOC, ODT, RTF, TXT, Markdown, or HTML document using the explicit safe conversion matrix.", convert_document)

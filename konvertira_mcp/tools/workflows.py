@@ -10,7 +10,16 @@ from pydantic import Field
 from backend.processors.document import convert_document as process_document
 from backend.processors.image import convert_image as process_image
 from backend.processors.office import convert_office
-from backend.processors.pdf import extract_pdf_pages, images_to_pdf, merge_pdfs, pdf_to_images
+from backend.processors.pdf import (
+    delete_pdf_pages as process_delete_pdf_pages,
+    extract_pdf_pages,
+    images_to_pdf,
+    merge_pdfs,
+    optimize_pdf as process_optimize_pdf,
+    pdf_to_images,
+    reorder_pdf_pages as process_reorder_pdf_pages,
+    split_pdf_pages,
+)
 from backend.formats import conversion_capability
 from backend.services.metadata import (
     inspect_file_metadata as inspect_file_metadata_service,
@@ -37,6 +46,14 @@ async def convert_image(
     width: Annotated[int | None, Field(ge=1, le=20000)] = None,
     height: Annotated[int | None, Field(ge=1, le=20000)] = None,
     allow_upscale: bool = False,
+    target_size_bytes: Annotated[
+        int | None,
+        Field(ge=1024, description="Best-effort target size in bytes for lossy JPEG, WebP, or AVIF output."),
+    ] = None,
+    background_color: Annotated[
+        str,
+        Field(min_length=1, max_length=100, description="Color used to flatten transparency when producing JPEG output."),
+    ] = "#ffffff",
 ) -> ProcessedResult:
     async def operation() -> ProcessedResult:
         definition = input_format(file)
@@ -46,6 +63,7 @@ async def convert_image(
         result = await asyncio.to_thread(
             process_image, content, output_format.value, quality=quality,
             width=width, height=height, allow_upscale=allow_upscale,
+            target_size_bytes=target_size_bytes, background_color=background_color,
         )
         return stored_result(result.content, output_format.value, file.file_name, "The image was converted to a new downloadable copy.")
     return await run_heavy("convert_image", operation)
@@ -102,6 +120,78 @@ async def extract_pdf_file_pages(
         result = await asyncio.to_thread(extract_pdf_pages, content, pages)
         return stored_result(result.content, ".pdf", file.file_name, "The selected pages were extracted to a new PDF.")
     return await run_heavy("extract_pdf_pages", operation)
+
+
+async def split_pdf(file: OpenAIFile) -> ProcessedResult:
+    async def operation() -> ProcessedResult:
+        if input_format(file).id != "pdf":
+            raise McpWorkflowError("The input must be a PDF.")
+        content = await download_input(file, settings.max_pdf_size)
+        result = await asyncio.to_thread(split_pdf_pages, content)
+        return stored_result(
+            result.content,
+            result.extension,
+            file.file_name,
+            "The PDF was split into individual page PDFs in a ZIP archive.",
+        )
+    return await run_heavy("split_pdf", operation)
+
+
+async def reorder_pdf_pages(
+    file: OpenAIFile,
+    order: Annotated[
+        str,
+        Field(min_length=1, max_length=500, description="Comma-separated one-based page order containing every page exactly once."),
+    ],
+) -> ProcessedResult:
+    async def operation() -> ProcessedResult:
+        if input_format(file).id != "pdf":
+            raise McpWorkflowError("The input must be a PDF.")
+        content = await download_input(file, settings.max_pdf_size)
+        result = await asyncio.to_thread(process_reorder_pdf_pages, content, order)
+        return stored_result(
+            result.content,
+            result.extension,
+            file.file_name,
+            "A new PDF was created in the requested page order.",
+        )
+    return await run_heavy("reorder_pdf_pages", operation)
+
+
+async def delete_pdf_pages(
+    file: OpenAIFile,
+    pages: Annotated[
+        str,
+        Field(min_length=1, max_length=500, description="One-based page selection such as 2,4-6 to exclude from the new PDF."),
+    ],
+) -> ProcessedResult:
+    async def operation() -> ProcessedResult:
+        if input_format(file).id != "pdf":
+            raise McpWorkflowError("The input must be a PDF.")
+        content = await download_input(file, settings.max_pdf_size)
+        result = await asyncio.to_thread(process_delete_pdf_pages, content, pages)
+        return stored_result(
+            result.content,
+            result.extension,
+            file.file_name,
+            "A new PDF was created without the selected pages.",
+        )
+    return await run_heavy("delete_pdf_pages", operation)
+
+
+async def optimize_pdf(file: OpenAIFile) -> ProcessedResult:
+    async def operation() -> ProcessedResult:
+        if input_format(file).id != "pdf":
+            raise McpWorkflowError("The input must be a PDF.")
+        content = await download_input(file, settings.max_pdf_size)
+        result = await asyncio.to_thread(process_optimize_pdf, content)
+        return stored_result(
+            result.content,
+            result.extension,
+            file.file_name,
+            "The PDF received a lossless structural optimization; images were not downsampled.",
+        )
+    return await run_heavy("optimize_pdf", operation)
 
 
 async def convert_pdf_to_images(
