@@ -85,6 +85,29 @@ def test_tool_registration_schemas_and_annotations() -> None:
     assert background.input_schema["properties"]["output_format"]["default"] == "png"
 
 
+def test_openai_file_schema_matches_plugin_file_param_contract() -> None:
+    schema = OpenAIFile.model_json_schema()
+    assert set(schema["properties"]) == {
+        "download_url",
+        "file_id",
+        "mime_type",
+        "file_name",
+    }
+    assert schema["required"] == ["download_url", "file_id"]
+    assert schema["properties"]["download_url"]["type"] == "string"
+    assert schema["properties"]["file_id"]["type"] == "string"
+    assert schema["properties"]["mime_type"]["type"] == "string"
+    assert schema["properties"]["file_name"]["type"] == "string"
+    assert schema["additionalProperties"] is False
+
+    omitted_optional = OpenAIFile(
+        download_url="https://files.oaiusercontent.com/example",
+        file_id="file-123",
+    )
+    assert omitted_optional.mime_type is None
+    assert omitted_optional.file_name is None
+
+
 def test_unsupported_conversion_rejects_before_download(monkeypatch) -> None:
     download_started = False
 
