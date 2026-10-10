@@ -1,5 +1,25 @@
 # Konvertira frontend
 
+## Static legal pages
+
+Direct requests to `/privacy`, `/terms` and `/support` are served as static HTML
+by exact Nginx locations, with the existing security headers and `no-cache`.
+The pages need no JavaScript and use the same-origin `/legal.css` stylesheet.
+Vite copies these public assets to `dist`, which the frontend image serves.
+React page sources remain for SPA navigation. When updating policy text, update
+both versions; `legalPages.test.tsx` checks substantive paragraph/heading parity.
+
+Deploy from the repository root after review:
+
+```sh
+docker compose build frontend
+docker compose up -d --no-deps --force-recreate frontend
+docker compose exec -T frontend nginx -t
+curl -fsS https://konvertira.com/privacy | grep -i "Privacy philosophy"
+curl -fsS https://konvertira.com/terms | grep -i "Terms of service"
+curl -fsS https://konvertira.com/support | grep -i "Contact support"
+```
+
 Production-oriented React frontend for [konvertira.com](https://konvertira.com), a privacy-first image conversion and metadata cleaning service.
 
 ## Local image processing
