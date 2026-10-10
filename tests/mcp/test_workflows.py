@@ -9,7 +9,7 @@ from pypdf import PdfReader, PdfWriter
 from backend.models.files import ProcessedFile
 from backend.services.resource_limits import mcp_resource_limits
 from backend.services.storage import TemporaryStorage
-from konvertira_mcp.models.files import ImageOutputFormat, OpenAIFile
+from konvertira_mcp.models.files import ImageOutputFormat, OpenAIFile, PdfImageOutputFormat
 from konvertira_mcp.server import mcp
 from konvertira_mcp.tools import common, workflows
 
@@ -255,3 +255,33 @@ def test_pdf_workflows_reject_encrypted_input(monkeypatch, tmp_path) -> None:
 
     with pytest.raises(ValueError, match="Encrypted PDFs"):
         asyncio.run(workflows.split_pdf(file_ref("encrypted.pdf", "application/pdf")))
+
+
+@pytest.mark.parametrize("format", list(PdfImageOutputFormat))
+def test_real_pdf_render_mcp_and_result_expiration(monkeypatch, tmp_path, format) -> None:
+    from tests.backend.test_pdf_processor import colored_pdf
+    configure_file_workflow(monkeypatch, tmp_path, colored_pdf())
+    result = asyncio.run(workflows.convert_pdf_to_images(file_ref("source.pdf", "application/pdf"), format, dpi=72, pages="3,1"))
+    assert result.success and result.filename == "source.zip"
+    assert result.content_type == "application/zip"
+    with zipfile.ZipFile(io.BytesIO(stored_content(tmp_path))) as archive:
+        extension = "jpg" if format == PdfImageOutputFormat.JPEG else format.value
+        assert archive.namelist() == [f"page-0001.{extension}", f"page-0002.{extension}"]
+        with Image.open(io.BytesIO(archive.read(archive.namelist()[0]))) as image:
+            assert image.size == (300, 60)
+    stored = next(tmp_path.iterdir())
+    assert common.mcp_storage.cleanup(now=stored.stat().st_mtime + 901) == 1
+    assert not list(tmp_path.iterdir())
+
+
+def test_pdf_render_schema_and_openai_optional_fields_unchanged() -> None:
+    tools = {tool.name: tool for tool in asyncio.run(mcp.list_tools())}
+    tool = tools["convert_pdf_to_images"]
+    assert tool.meta["openai/fileParams"] == ["file"]
+    assert tool.annotations == tools["split_pdf"].annotations
+    assert tool.input_schema["properties"]["dpi"]["minimum"] == 36
+    assert tool.input_schema["properties"]["dpi"]["maximum"] == 200
+    assert tool.input_schema["properties"]["dpi"]["default"] == 144
+    reference = OpenAIFile(download_url="https://files.oaiusercontent.com/file", file_id="file-123")
+    assert reference.mime_type is None and reference.file_name is None
+    assert OpenAIFile.model_json_schema()["required"] == ["download_url", "file_id"]

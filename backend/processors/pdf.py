@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import io
 import math
+import threading
 import zipfile
 from dataclasses import dataclass
+from contextlib import closing
 from typing import Iterable, Sequence
 
-import pymupdf as fitz
+import pypdfium2 as pdfium
 from PIL import Image, ImageOps
 from pillow_heif import register_heif_opener
 from pypdf import PdfReader, PdfWriter
@@ -18,6 +20,19 @@ from backend.models.files import FileProcessingError, ProcessingErrorCode
 from config import settings
 
 register_heif_opener()
+
+# PDFium forbids concurrent native calls, even for different documents. All
+# document/page/bitmap lifetimes stay inside this process-wide, non-queuing gate.
+_pdfium_lock = threading.Lock()
+
+
+class _LimitedPdfBuffer(io.BytesIO):
+    """Bound image encoders and ZIP writes before allocating excess output."""
+
+    def write(self, data: bytes) -> int:
+        if self.tell() + len(data) > settings.max_pdf_output_size:
+            raise FileProcessingError("The generated image archive exceeds the output size limit.", 413, ProcessingErrorCode.DECODED_CONTENT_TOO_LARGE)
+        return super().write(data)
 
 
 @dataclass(frozen=True, slots=True)
@@ -198,43 +213,53 @@ def pdf_to_images(content: bytes, *, output_format: str = "png", dpi: int = 144,
         raise FileProcessingError("PDF pages can be exported as PNG, JPEG, or WebP.", 422, ProcessingErrorCode.UNSUPPORTED_FORMAT)
     if not 36 <= dpi <= settings.max_pdf_raster_dpi:
         raise FileProcessingError(f"DPI must be between 36 and {settings.max_pdf_raster_dpi}.", 422)
-    _reader(content)
-    document: fitz.Document | None = None
+    reader = _reader(content)
+    indexes = parse_page_selection(selection, len(reader.pages)) if selection else list(range(len(reader.pages)))
+    if not _pdfium_lock.acquire(blocking=False):
+        raise FileProcessingError("PDF rendering is busy. Please try again shortly.", 429, ProcessingErrorCode.TEMPORARY_CAPACITY_UNAVAILABLE)
     try:
-        document = fitz.open(stream=content, filetype="pdf")
-        indexes = parse_page_selection(selection, document.page_count) if selection else list(range(document.page_count))
-        total_pixels = 0
-        output = io.BytesIO()
-        extension = "jpg" if output_format.lower() in {"jpg", "jpeg"} else output_format.lower()
-        pil_format = "JPEG" if extension == "jpg" else extension.upper()
-        with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-            for number, index in enumerate(indexes, start=1):
-                page = document.load_page(index)
-                scale = dpi / 72
-                expected_pixels = math.ceil(page.rect.width * scale) * math.ceil(page.rect.height * scale)
-                if total_pixels + expected_pixels > settings.max_pdf_generated_pixels:
-                    raise FileProcessingError("Generated images would exceed the pixel limit.", 413, ProcessingErrorCode.DECODED_CONTENT_TOO_LARGE)
-                pixmap = page.get_pixmap(matrix=fitz.Matrix(scale, scale), alpha=pil_format != "JPEG")
-                total_pixels += pixmap.width * pixmap.height
+        with pdfium.PdfDocument(content) as document:
+            if len(document) != len(reader.pages):
+                raise FileProcessingError("The PDF pages could not be rendered.", 500, ProcessingErrorCode.CONVERSION_FAILED)
+            # Account for /UserUnit explicitly: PDFium's scale API does not.
+            scales: list[float] = []
+            total_pixels = 0
+            for index in indexes:
+                unit = float(reader.pages[index].user_unit)
+                scale = dpi / 72 * unit
+                with closing(document[index]) as page:
+                    width, height = page.get_size()
+                if not all(math.isfinite(value) and value > 0 for value in (scale, width, height)):
+                    raise FileProcessingError("The PDF pages could not be rendered.", 500, ProcessingErrorCode.CONVERSION_FAILED)
+                pixels = math.ceil(width * scale) * math.ceil(height * scale)
+                total_pixels += pixels
                 if total_pixels > settings.max_pdf_generated_pixels:
                     raise FileProcessingError("Generated images would exceed the pixel limit.", 413, ProcessingErrorCode.DECODED_CONTENT_TOO_LARGE)
-                mode = "RGBA" if pixmap.alpha else "RGB"
-                image = Image.frombytes(mode, (pixmap.width, pixmap.height), pixmap.samples)
-                encoded = io.BytesIO()
-                image.save(encoded, format=pil_format, quality=90, optimize=True)
-                image.close()
-                archive.writestr(f"page-{number:04d}.{extension}", encoded.getvalue())
-        result = output.getvalue()
-        if len(result) > settings.max_pdf_output_size:
-            raise FileProcessingError("The generated image archive exceeds the output size limit.", 413, ProcessingErrorCode.DECODED_CONTENT_TOO_LARGE)
-        return PdfResult(result, len(indexes), ".zip", "application/zip")
+                scales.append(scale)
+            document.init_forms()
+            extension = "jpg" if output_format.lower() in {"jpg", "jpeg"} else output_format.lower()
+            pil_format = "JPEG" if extension == "jpg" else extension.upper()
+            with _LimitedPdfBuffer() as output:
+                with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+                    rendered_pixels = 0
+                    for number, (index, scale) in enumerate(zip(indexes, scales), start=1):
+                        with closing(document[index]) as page:
+                            with closing(page.render(scale=scale, fill_color=(255, 255, 255, 255) if pil_format == "JPEG" else (0, 0, 0, 0), rev_byteorder=True, draw_annots=True, limit_image_cache=True)) as bitmap:
+                                rendered_pixels += bitmap.width * bitmap.height
+                                if rendered_pixels > settings.max_pdf_generated_pixels:
+                                    raise FileProcessingError("Generated images would exceed the pixel limit.", 413, ProcessingErrorCode.DECODED_CONTENT_TOO_LARGE)
+                                # to_pil may share native memory; encode and close
+                                # the PIL view before closing the bitmap.
+                                with bitmap.to_pil() as image, _LimitedPdfBuffer() as encoded:
+                                    image.save(encoded, format=pil_format, quality=90, optimize=True)
+                                    archive.writestr(f"page-{number:04d}.{extension}", encoded.getvalue())
+                return PdfResult(output.getvalue(), len(indexes), ".zip", "application/zip")
     except FileProcessingError:
         raise
     except Exception as exc:
         raise FileProcessingError("The PDF pages could not be rendered.", 500, ProcessingErrorCode.CONVERSION_FAILED) from exc
     finally:
-        if document is not None:
-            document.close()
+        _pdfium_lock.release()
 
 
 def inspect_pdf_metadata(content: bytes) -> dict[str, object]:

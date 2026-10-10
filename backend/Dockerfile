@@ -15,6 +15,10 @@ RUN apt-get update \
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY scripts/collect_pdf_notices.py ./scripts/collect_pdf_notices.py
+RUN python scripts/collect_pdf_notices.py /usr/share/konvertira/pdf-notices --debian-runtime \
+    && chmod -R a+rX /usr/share/konvertira/pdf-notices
+
 COPY config.py main.py mcp_server.py ./
 COPY format_registry.json ./
 COPY backend ./backend

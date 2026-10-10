@@ -62,7 +62,7 @@ MCP tool ──────┼─ resource guard ─ processor/service ─ respo
                └─ shared format registry and validation
 ```
 
-Processors do not know about HTTP or MCP schemas. Routers and tools validate declared filenames/MIME types, enforce resource guards, and dispatch to the same processing layer. Extensions and MIME claims remain untrusted; Pillow, pypdf/PyMuPDF, python-docx/openpyxl, LibreOffice, and guarded package parsing verify actual content as applicable.
+Processors do not know about HTTP or MCP schemas. Routers and tools validate declared filenames/MIME types, enforce resource guards, and dispatch to the same processing layer. Extensions and MIME claims remain untrusted; Pillow, pypdf/PDFium, python-docx/openpyxl, LibreOffice, and guarded package parsing verify actual content as applicable.
 
 ## Setup
 
@@ -84,7 +84,7 @@ Copy-Item .env.example .env.local
 npm run dev
 ```
 
-Python dependencies are pinned in `requirements.txt`. Pillow/pillow-heif handle image codecs; pypdf and PyMuPDF handle PDF structure/rasterization; python-docx, Markdown, Beautiful Soup, and openpyxl cover direct bounded conversions; defusedxml protects metadata XML parsing. LibreOffice Writer, Calc, Impress, and DejaVu fonts are installed only in the backend image for conversions that require an external engine.
+Python dependencies are pinned in `requirements.txt`. Pillow/pillow-heif handle image codecs; pypdf handles PDF structure and pypdfium2/PDFium handles rasterization; python-docx, Markdown, Beautiful Soup, and openpyxl cover direct bounded conversions; defusedxml protects metadata XML parsing. LibreOffice Writer, Calc, Impress, and DejaVu fonts are installed only in the backend image for conversions that require an external engine. See [PDF rendering, notices and migration checks](docs/pdf-processing.md). Both backend and MCP images retain installed PDF-library/native-binary notices under `/usr/share/konvertira/pdf-notices`.
 
 Never put secrets in `VITE_*` variables because Vite embeds them into the public bundle. `.env.example` contains placeholders only; `.env*`, keys, virtual environments, build output, temporary results, and backups are excluded from Docker build context.
 

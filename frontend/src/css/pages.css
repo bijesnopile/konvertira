@@ -10,4 +10,20 @@
     @apply rounded text-forest-700 underline decoration-forest-300 underline-offset-4 hover:text-forest-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-500;
   }
   .legal-note { @apply mb-10 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-900; }
+  .legal-document h1 { @apply my-4 text-4xl font-semibold tracking-tight text-ink sm:text-5xl; }
+  .legal-document .legal-intro { @apply mb-8; }
+  .legal-document .legal-updated { @apply mb-4 text-sm; }
+  .legal-document .legal-note p { color: inherit; }
+  .legal-document h2 { scroll-margin-top: 7rem; }
+  .legal-document section + section { margin-top: 2.5rem; }
+  .legal-toc { @apply my-8 rounded-2xl bg-forest-50 p-5; }
+  .legal-toc ol { list-style: none; padding: 0; columns: 2 17rem; column-gap: 2rem; }
+  .legal-toc li { break-inside: avoid; margin-bottom: .6rem; }
+  .legal-related { @apply mt-12 flex flex-wrap gap-4 border-t border-forest-200 pt-6; }
+  .legal-table-scroll { max-width: 100%; overflow-x: auto; margin: 1.5rem 0; }
+  .legal-table-scroll:focus-visible { outline: 2px solid #357248; outline-offset: 3px; }
+  .legal-document table { border-collapse: collapse; width: 100%; min-width: 42rem; font-size: .875rem; line-height: 1.6; }
+  .legal-document caption { text-align: left; font-weight: 600; margin-bottom: .75rem; }
+  .legal-document th, .legal-document td { border: 1px solid #c5e1cc; padding: .75rem; text-align: left; vertical-align: top; }
+  .legal-document thead { @apply bg-forest-100; }
 }

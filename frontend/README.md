@@ -2,12 +2,22 @@
 
 ## Static legal pages
 
-Direct requests to `/privacy`, `/terms` and `/support` are served as static HTML
+Direct requests to `/privacy`, `/terms`, `/security` and `/support` are served as static HTML
 by exact Nginx locations, with the existing security headers and `no-cache`.
 The pages need no JavaScript and use the same-origin `/legal.css` stylesheet.
 Vite copies these public assets to `dist`, which the frontend image serves.
-React page sources remain for SPA navigation. When updating policy text, update
-both versions; `legalPages.test.tsx` checks substantive paragraph/heading parity.
+React pages remain for SPA navigation without hydration of the static pages.
+The three policies have a single reviewed source in `src/legal/*.json`.
+`npm run legal:generate` mechanically regenerates their checked-in public HTML;
+it also runs before development and production builds. Never edit generated
+policy HTML directly. Body fragments are trusted repository copy, not runtime
+or user-supplied HTML. `npm run legal:check` and `legalPages.test.tsx` detect stale
+copies and verify full article/anchor/link parity. Support remains a separate
+small React/static page with a parity test.
+
+All policy files are review drafts. Resolve `docs/legal-review-checklist.md`,
+especially controller identity, infrastructure retention/transfers and licensing,
+before publication. Generation does not certify legal compliance.
 
 Deploy from the repository root after review:
 
@@ -15,9 +25,10 @@ Deploy from the repository root after review:
 docker compose build frontend
 docker compose up -d --no-deps --force-recreate frontend
 docker compose exec -T frontend nginx -t
-curl -fsS https://konvertira.com/privacy | grep -i "Privacy philosophy"
+curl -fsS https://konvertira.com/privacy | grep -i "Privacy Policy"
 curl -fsS https://konvertira.com/terms | grep -i "Terms of service"
 curl -fsS https://konvertira.com/support | grep -i "Contact support"
+curl -fsS https://konvertira.com/security | grep -i "Security &amp; Data Handling"
 ```
 
 Production-oriented React frontend for [konvertira.com](https://konvertira.com), a privacy-first image conversion and metadata cleaning service.
@@ -102,7 +113,7 @@ The production output is written to `dist/`.
 Build with the public API URL baked into the Vite bundle:
 
 ```bash
-docker build --build-arg VITE_API_BASE_URL=https://api.konvertira.com -t konvertira-frontend .
+docker build -f frontend/Dockerfile --build-arg VITE_API_BASE_URL=https://api.konvertira.com -t konvertira-frontend .
 ```
 
 Run the container:
@@ -111,7 +122,9 @@ Run the container:
 docker run --rm -p 8080:80 konvertira-frontend
 ```
 
-Open `http://localhost:8080`. The container exposes port 80 and serves the app with nginx. The nginx fallback configuration sends unknown application paths to `index.html`, so direct visits to `/privacy`, `/terms`, and `/about` work correctly.
+Run the build from the repository root. Open `http://localhost:8080`. The container
+serves `/privacy`, `/terms`, `/security` and `/support` as static HTML, never an
+SPA fallback. Other application paths, including `/about`, use `index.html`.
 
 ## Deployment notes
 

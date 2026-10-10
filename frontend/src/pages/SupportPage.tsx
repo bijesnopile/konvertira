@@ -14,6 +14,8 @@ export function SupportPage() {
         <p>For reproducible bugs, feature ideas, or project questions, visit the <a href="https://github.com/bijesnopile/konvertira" target="_blank" rel="noopener noreferrer">Konvertira GitHub repository</a>.</p>
         <h2>Legal questions</h2>
         <p>For legal notices or questions about the Terms or Privacy page, email <a href="mailto:legal@konvertira.com">legal@konvertira.com</a>.</p>
+        <h2>Security and data handling</h2>
+        <p>Read <a href="/security">Security &amp; Data Handling</a> for safeguards and limitations. Report suspected vulnerabilities privately to <a href="mailto:legal@konvertira.com">legal@konvertira.com</a>; do not post sensitive files or live download links in public issues.</p>
       </article>
     </>
   )

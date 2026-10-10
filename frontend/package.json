@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "legal:generate": "node scripts/generate-legal-pages.mjs",
+    "legal:check": "node scripts/generate-legal-pages.mjs --check",
+    "predev": "npm run legal:generate",
+    "prebuild": "npm run legal:generate",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b --pretty false",

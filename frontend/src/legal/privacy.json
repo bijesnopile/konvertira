@@ -1,0 +1,217 @@
+{
+  "slug": "privacy",
+  "title": "Privacy Policy",
+  "updated": "October 11, 2026",
+  "summary": "Local-labelled image tools keep selected images in your browser. Explicit server tools and all ChatGPT/MCP tools send or retrieve files for processing. Stored results have a default application lifetime of approximately 15 minutes, not a guarantee of deletion from every system. This summary is a guide; the full notice below explains the data flows, rights and outstanding deployment disclosures.",
+  "reviewNotice": "PRE-PUBLICATION LEGAL REQUIREMENT: Confirm and publish the controller's lawful postal/contact address and any required operator identifiers. Actual provider identities, processing locations, transfer safeguards, infrastructure log retention and backup practices must also be verified before this draft can be treated as a complete public notice. An email address alone does not resolve all applicable identity requirements.",
+  "sections": [
+    {
+      "id": "controller",
+      "title": "1. Who is responsible and how to contact us",
+      "body": [
+        "<p>Konvertira is operated by Matej Tokić, an independent developer based in Croatia. He is the controller for the service's own operational personal-data processing, such as handling enquiries and deciding how to protect the public service. Privacy enquiries and requests may be sent to <a href=\"mailto:legal@konvertira.com\">legal@konvertira.com</a>. Technical support is available at <a href=\"mailto:support@konvertira.com\">support@konvertira.com</a>. No company, registered trade, DPO appointment or regulatory approval is asserted here.</p>",
+        "<p>The legal role for content an organisation submits on another person's behalf can differ from the role for operational data. A controller/processor assessment and any required Article 28 agreement must be completed for that use; the public tool does not automatically supply a negotiated processing agreement. Do not assume every file, infrastructure provider or platform falls under the same GDPR role. The unresolved identity and deployment disclosures are identified above, not filled with invented information.</p>"
+      ]
+    },
+    {
+      "id": "scope",
+      "title": "2. Scope and sources of information",
+      "body": [
+        "<p>This notice covers Konvertira's website, server processing, MCP integration, temporary downloads and support correspondence. Personal data may come directly from you through requests, uploads and email, from files you submit about other people, or from an OpenAI-provided file reference used in an MCP request. Technical request information is generated when a browser or platform connects to the service. Konvertira does not obtain unrestricted access to your device or ChatGPT account.</p>",
+        "<p>OpenAI and other services you choose have separate privacy information. This notice describes Konvertira's handling, not their independent retention or legal bases. It distinguishes code-verified behaviour from infrastructure settings that still require confirmation. Where Article 14 applies to information about people other than the requester, the operator must assess the relevant information duties and any lawful exceptions rather than presume all such duties disappear because files are temporary.</p>"
+      ]
+    },
+    {
+      "id": "local-processing",
+      "title": "3. Local browser processing",
+      "body": [
+        "<p>Supported JPG/JPEG, PNG and static WebP image workflows labelled local decode images on your device, render their pixels to a temporary canvas and create a new file in your browser. The selected image bytes are not sent to Konvertira's API by these tools. Local processing does not silently fall back to a server upload if decoding or conversion fails. A failure is shown to you instead.</p>",
+        "<p>Loading the website still involves network requests for pages and assets, and therefore technical request data. Your browser, extensions, operating system, downloads folder and device backups have their own behaviour. Local processing is not a claim that those systems retain nothing or that your device is secure. Choosing a separate server-labelled image tool, such as background removal, changes the processing boundary even if the file is a JPEG or PNG.</p>"
+      ]
+    },
+    {
+      "id": "server-processing",
+      "title": "4. Server-side operations",
+      "body": [
+        "<p>PDF, document, spreadsheet, presentation, unified metadata, advanced image-codec and background-removal operations use the server. Common images can also be processed through explicitly selected server image tools. Uploaded files and parameters are received for the requested operation, validated, processed by shared backend code and returned directly or made temporarily downloadable. The application necessarily reads the file content to perform these tasks.</p>",
+        "<p>Many web results are returned in the response rather than placed in the token-based result store. Decoded content and intermediate buffers exist in memory; Office conversions can create temporary input, output and profile files in a job workspace. Normal cleanup is intended to remove that workspace when conversion ends. A crash, storage error or infrastructure snapshot can affect actual deletion. No runtime network call to an external AI-inference service is used for background removal.</p>"
+      ]
+    },
+    {
+      "id": "mcp",
+      "title": "5. ChatGPT and MCP processing",
+      "body": [
+        "<p>All Konvertira MCP tools are server-backed. A tool receives a typed file reference that can include an OpenAI file identifier, download URL, filename and declared MIME type, together with the requested operation's parameters. The backend retrieves that file through the constrained HTTPS OpenAI download flow. A reference is not permission to browse your whole conversation, retrieve unrelated account files or read arbitrary external URLs.</p>",
+        "<p>The tool returns a structured result, metadata report or temporary download link to the calling platform. Returned metadata can itself contain names, locations or other personal information. OpenAI can then handle those results as part of your ChatGPT use. Konvertira's application expiry does not delete an attachment, conversation, result text or downloaded copy held by OpenAI. Use OpenAI's own privacy controls and information for that separate relationship.</p>"
+      ]
+    },
+    {
+      "id": "content-data",
+      "title": "6. Files, parameters and derived data",
+      "body": [
+        "<p>Files can contain images, text, document properties, page content, formulas, author names, GPS fields, dates, embedded objects and information about people other than the sender. The precise personal-data categories depend on what you submit; Konvertira does not need every possible category to provide conversion. Parameters include target formats, selected pages, image dimensions, quality, colour or compression choices. Outputs and metadata reports may preserve or reveal personal data from the source.</p>",
+        "<p>A filename, file identifier or signed URL may also be sensitive even when the content is not. Do not include unnecessary identifiers in filenames or support messages. The service is not designed to request health records, biometric identification material, criminal-offence data or other specially protected datasets. An ordinary contractual basis is not by itself an Article 9 or Article 10 condition. Before any such processing, a separate lawful assessment and appropriate safeguards are required.</p>"
+      ]
+    },
+    {
+      "id": "technical-data",
+      "title": "7. Technical requests and operational information",
+      "body": [
+        "<p>Web requests can expose an IP address, time, requested path, browser or client headers, response status and connection information to the origin or intermediary infrastructure. The application uses client-address information for HTTP rate limiting and capacity protection, trusting forwarded addresses only from configured proxy peers. MCP quotas are process-wide and do not require a profile of an entire ChatGPT account. In-memory limiters store recent request events and active-capacity information.</p>",
+        "<p>MCP operational logging records tool names, completion outcomes, durations and reasons such as busy, timeout or rate limit; it is not designed to log submitted file contents or signed download URLs. The provided backend/MCP Docker commands disable Uvicorn access logs, but this does not disable Nginx, host, proxy or provider logs. Their actual fields, rotation and retention have not been established by the repository and must be confirmed. No zero-day log-retention claim is made.</p>"
+      ]
+    },
+    {
+      "id": "support-data",
+      "title": "8. Support and email correspondence",
+      "body": [
+        "<p>If you email the operator, your sender address, name if supplied, message, attachments and correspondence metadata are handled to answer the enquiry, investigate an issue or address a rights request. Email providers may process that information under their own applicable arrangements. The provider identity and mailbox retention rules require deployment confirmation; this notice does not assume a particular email host or deletion interval.</p>",
+        "<p>Send a description of the tool, format and error before sending a file. Do not email confidential originals, identity documents, passwords or private download links by default. A rights request may require proportionate identity verification, but unnecessary identification documents should not be collected. Public GitHub issues are a separate, publicly visible channel; avoid including personal data, file contents or credentials there.</p>"
+      ]
+    },
+    {
+      "id": "purposes-bases",
+      "title": "9. Purposes and legal bases",
+      "body": [
+        "<p>For personal data of the requester that is objectively necessary to provide a validly requested service, Article 6(1)(b) GDPR may apply. It is not a blanket basis for every item inside a file, every third person's information or every operational activity. Where Konvertira is a controller for third-party content, the relevant lawful basis must be assessed separately; where it acts as a processor, it must act on lawful documented instructions under appropriate arrangements.</p>",
+        "<p>Limited service security, abuse prevention and troubleshooting may rely on Article 6(1)(f), subject to a documented necessity and balancing assessment and your right to object. Compliance with a specific legal obligation may rely on Article 6(1)(c). Enquiries necessary to enter or fulfil an agreement may use Article 6(1)(b); other correspondence can require a separately assessed legitimate interest or legal obligation. Valid consent under Article 6(1)(a) is used only when genuinely sought for a specific optional purpose. Browsing, uploading or accepting Terms is not blanket GDPR consent.</p>"
+      ]
+    },
+    {
+      "id": "minimisation",
+      "title": "10. Minimisation and purpose limitation",
+      "body": [
+        "<p>The local-first design avoids receiving image contents where supported processing can stay on your device. Server tools request files and parameters necessary for the chosen workflow rather than an account profile or unrelated conversation history. The repository has no public account registration, payment collection, advertising tracker or implemented analytics integration. Operational processing should remain limited to delivering and protecting the service and handling necessary correspondence.</p>",
+        "<p>Konvertira does not use submitted files to train its models, build advertising profiles or sell their contents as an implemented product activity. Background removal uses a fixed pretrained model for inference, not learning from your upload. These statements concern Konvertira, not OpenAI's independent handling under your ChatGPT relationship. Any proposed new purpose requires a separate assessment, appropriate notice and lawful basis before processing begins; these pages are not advance permission for unrelated reuse.</p>"
+      ]
+    },
+    {
+      "id": "retention-table",
+      "title": "11. Processing and retention overview",
+      "body": [
+        "<p>The table distinguishes application behaviour from unresolved infrastructure arrangements. A reference to a legal basis is conditional on the role and lawful-use assessment above; it is not a claim that every submitted file is lawful to process.</p>",
+        "<div class=\"legal-table-scroll\" role=\"region\" aria-label=\"Processing and retention table\" tabindex=\"0\"><table><caption>Data categories, purposes, bases, retention and recipients</caption><thead><tr><th scope=\"col\">Data category</th><th scope=\"col\">Purpose</th><th scope=\"col\">Legal basis</th><th scope=\"col\">Retention rule</th><th scope=\"col\">Recipients</th></tr></thead><tbody><tr><th scope=\"row\">Local image contents</th><td>Browser conversion or cleaning</td><td>No receipt of image bytes by Konvertira in that workflow</td><td>Browser/device controlled; local buffers and downloads</td><td>Your device; no Konvertira API upload</td></tr><tr><th scope=\"row\">Server input and intermediates</th><td>Requested transformation</td><td>Article 6(1)(b) where applicable; other-person data and processor roles need separate assessment</td><td>Processing lifetime; normal workspace cleanup, with crash and infrastructure caveats</td><td>Operator's processing system and relevant hosting/transport infrastructure</td></tr><tr><th scope=\"row\">Stored result files</th><td>Temporary delivery</td><td>Same assessed service basis or documented processor instructions</td><td>Default 900-second application TTL plus cleanup scheduling; not all-system erasure</td><td>Requester, anyone holding the result URL, relevant infrastructure; calling platform for MCP</td></tr><tr><th scope=\"row\">MCP references and parameters</th><td>Retrieve the selected file and perform the tool call</td><td>Service basis where applicable; platform's independent basis is separate</td><td>Request/job lifetime in application; platform and infrastructure retention require separate consideration</td><td>Konvertira, OpenAI download service and calling platform</td></tr><tr><th scope=\"row\">Rate-limit state</th><td>Capacity and abuse protection</td><td>Article 6(1)(f), subject to balancing</td><td>60-second event window; inactive keys removed opportunistically, process memory not a permanent access history</td><td>Application runtime/operator</td></tr><tr><th scope=\"row\">Technical/security logs</th><td>Operation, diagnosis and incident handling</td><td>Article 6(1)(f); Article 6(1)(c) for specific obligations</td><td>Actual origin, edge and host schedules not yet confirmed; no invented fixed period</td><td>Operator and relevant infrastructure providers; authorities only with lawful basis</td></tr><tr><th scope=\"row\">Support/rights correspondence</th><td>Answer enquiries and meet duties</td><td>Article 6(1)(b), (f) or (c), depending on purpose</td><td>Necessary for resolution and applicable legal retention; mailbox schedule must be established</td><td>Operator and email provider; advisers where necessary and lawfully engaged</td></tr></tbody></table></div>"
+      ]
+    },
+    {
+      "id": "temporary-storage",
+      "title": "12. Temporary results and deletion timing",
+      "body": [
+        "<p>The default configuration for stored processed results is RESULT_TTL_SECONDS=900, approximately 15 minutes from the stored file's modification time. Cleanup runs periodically while the service is active and on relevant storage/download paths. The periodic interval is bounded between 30 and 300 seconds, so expiry is not an exact-second filesystem erasure guarantee. Cleanup can be delayed by outages or filesystem errors. Operators may configure a different bounded retention period, which must be disclosed if materially different.</p>",
+        "<p>Expired results are intended to be removed from application storage and unavailable through downloads after cleanup. Direct-response results are not automatically kept there. Office workspaces have separate normal job cleanup; the result TTL is not an input-retention rule for all systems. Deleting a file does not prove secure physical overwriting, deletion from a snapshot or disappearance from a recipient's device. Konvertira is not a permanent storage or backup service; keep originals and download results promptly.</p>"
+      ]
+    },
+    {
+      "id": "logs-backups",
+      "title": "13. Infrastructure retention and backups",
+      "body": [
+        "<p>Application TTL does not remove data from reverse-proxy caches, access logs, diagnostic logs, email, VPS snapshots, provider systems, browser downloads or OpenAI. Temporary result volumes are documented as data that should not be backed up, but the repository cannot prove whether production snapshots exclude them. Actual backup inclusion, deletion cycles, restore practices and log retention must be checked with the operator and providers before publication.</p>",
+        "<p>Logs should avoid contents, credentials and signed result URLs, and access should be limited to operational needs. Rate-limit events use a short in-memory time window, but low-traffic inactive keys can remain until opportunistic cleanup or process restart; the event window is not a precise identifier-deletion deadline. Records genuinely required for a legal obligation or dispute may need separate lawful retention. No indefinite retention or all-infrastructure zero retention is authorised by this notice.</p>"
+      ]
+    },
+    {
+      "id": "recipients",
+      "title": "14. Recipients and infrastructure providers",
+      "body": [
+        "<p>Relevant recipient categories include hosting and network providers, DNS/CDN or reverse-proxy infrastructure where enabled, email services for correspondence, and OpenAI for the user-selected MCP flow. Service providers can encounter technical requests and, depending on their function, uploaded or returned content. It would be inaccurate to say files are never processed by third parties simply because Konvertira does not use an external conversion or inference API.</p>",
+        "<p>Cloudflare for DNS/proxy services and Contabo for VPS hosting are deployment candidates identified for this review, not facts established by the checked-in configuration. Their actual use, contracting entity, account settings, service locations and GDPR roles must be confirmed. DNS-only handling differs from an HTTPS-terminating proxy. Not every provider is necessarily a processor for every activity; processor agreements, independent-controller functions and any subprocessors must be assessed on their actual terms and behaviour.</p>"
+      ]
+    },
+    {
+      "id": "openai-boundaries",
+      "title": "15. Division of responsibility with OpenAI",
+      "body": [
+        "<p>OpenAI makes a selected file available through a tool reference and receives the tool's response. Konvertira applies its own validation and resource controls to that request. This integration is not access to your full conversation, browsing history, payment information or unrelated files. A metadata report or temporary result link returned to ChatGPT may become part of the platform's records, with handling outside Konvertira's application store.</p>",
+        "<p>OpenAI's relationship with you and its role in each data flow must be considered independently; it is not automatically described here as Konvertira's processor. For account retention, platform privacy rights and model-training settings, consult the applicable OpenAI notice and controls. If your concern relates to Konvertira's processing, contact the operator; if it relates to ChatGPT-held data, use the platform's process as well. An action on one side does not necessarily remove copies on the other.</p>"
+      ]
+    },
+    {
+      "id": "transfers",
+      "title": "16. Processing locations and international transfers",
+      "body": [
+        "<p>No claim is made that all personal data stays within Croatia or the EEA. A Croatian operator, HTTPS connection or European VPS brand does not prove the geographic location of proxy processing, provider support, email storage or OpenAI's systems. Actual hosting region, remote access and recipient locations remain to be confirmed. The public notice must identify relevant transfer arrangements once they are verified.</p>",
+        "<p>Where Konvertira makes a transfer subject to GDPR Chapter V, it must establish an applicable lawful mechanism and any required supplementary safeguards. An adequacy decision or appropriate contractual safeguards may be relevant, but neither is claimed to be in place for an unverified recipient. Exceptions are not a routine substitute for a sustainable arrangement. Ask legal@konvertira.com about applicable safeguards and how a copy can be obtained, with lawful redaction where necessary; do not infer a transfer mechanism from this draft.</p>"
+      ]
+    },
+    {
+      "id": "cookies",
+      "title": "17. Cookies, local storage and analytics",
+      "body": [
+        "<p>The inspected frontend does not implement advertising tracking, analytics scripts, cookie-based accounts or persistent localStorage/sessionStorage user profiles. Temporary object URLs are used for browser previews and downloads; they are not advertising cookies. External links to GitHub and X are ordinary links, not embedded tracking widgets. The legal pages work without JavaScript and load their stylesheet from the same site.</p>",
+        "<p>This code inspection does not prove that production infrastructure sets no cookies or injects no scripts. A CDN, bot-protection challenge or other provider can introduce cookies or similar mechanisms. Those settings and live responses must be reviewed, and any required disclosure or prior consent mechanism must be implemented before non-essential storage/tracking is enabled. Merely visiting the site is not valid consent. Browser cookie controls can be used, but do not replace the operator's own legal obligations.</p>"
+      ]
+    },
+    {
+      "id": "safeguards",
+      "title": "18. Security safeguards and limits",
+      "body": [
+        "<p>Implemented measures include size and format validation, bounded decoded content, concurrency and request limits, temporary result tokens, no-store download responses, security headers, and non-root backend/MCP runtimes in the supplied Docker setup. The production-facing design uses HTTPS; actual TLS termination and origin protection must be verified in deployment. Background-removal weights are fixed and hash-verified before inference. Further detail is on <a href=\"/security\">Security &amp; Data Handling</a>.</p>",
+        "<p>These controls reduce risk but do not guarantee confidentiality, anonymity, perfect malware prevention or uninterrupted service. Server processing is not end-to-end encrypted or zero-knowledge: the backend can read the file. No external audit, security certification or regulator approval is asserted. Metadata cleaning does not remove visible personal information or every hidden artifact. Choose local tools or a suitable offline application if your data should not leave your device.</p>"
+      ]
+    },
+    {
+      "id": "rights",
+      "title": "19. Your data-protection rights",
+      "body": [
+        "<p>Subject to the GDPR's conditions, you can request access to personal data, correction of inaccurate data, erasure, restriction of processing and portability where the applicable basis and automated-processing conditions are met. You can object to processing based on legitimate interests for reasons relating to your situation. These rights are not all unconditional; for example, a specific legal obligation may require retaining certain information.</p>",
+        "<p>If a particular optional activity actually relies on consent, you can withdraw that consent without affecting earlier lawful processing. No general consent is inferred here. Konvertira does not currently implement direct marketing or advertising profiling; an objection right is not a suggestion that those activities occur. An explanation will be given where a request cannot lawfully be fulfilled. Exercising a right does not require waiving other protections or agreeing to receive promotional material.</p>"
+      ]
+    },
+    {
+      "id": "rights-process",
+      "title": "20. How to make a request",
+      "body": [
+        "<p>Email <a href=\"mailto:legal@konvertira.com\">legal@konvertira.com</a> with the right you wish to exercise, approximate request time and a minimal description allowing relevant records to be located. Do not resend a sensitive file just to ask for deletion. There are no public account profiles to search, and an already removed result may no longer be identifiable. The operator should not collect extra personal data solely to recreate expired processing history.</p>",
+        "<p>Requests must be addressed without undue delay and normally within one month. A lawful extension of up to two additional months for complexity or number of requests must be explained within the first month. Reasonable verification may be requested where identity is genuinely in doubt, with no more information than necessary. Requests are normally free; any lawful exception for manifestly unfounded or excessive requests must be justified. Other people's rights must also be protected, and relevant recipients must be informed where required.</p>"
+      ]
+    },
+    {
+      "id": "complaints",
+      "title": "21. Supervisory authority and complaints",
+      "body": [
+        "<p>You may complain to the Croatian Personal Data Protection Agency, Agencija za zaštitu osobnih podataka (AZOP), through its <a href=\"https://azop.hr\">official website</a> and current contact or complaint channels. You may also contact another competent supervisory authority, including in the EU Member State of your habitual residence, workplace or alleged infringement where applicable.</p>",
+        "<p>You do not have to contact Konvertira first to exercise a regulator or court right. The operator nevertheless welcomes an opportunity to understand and address a concern. This notice does not assert that AZOP has approved Konvertira or that the service is certified GDPR-compliant. Current authority contact details should be obtained from the authority rather than assumed from an outdated copy.</p>"
+      ]
+    },
+    {
+      "id": "children",
+      "title": "22. Children and vulnerable individuals",
+      "body": [
+        "<p>The service is not directed specifically at children and has no account-based age verification. The operator does not intentionally seek children's profiles. Files can still contain information about children or other vulnerable individuals, whether supplied by them or by another user. Such data deserves particular care, minimisation and an appropriate lawful basis; upload authority alone is not a substitute for these requirements.</p>",
+        "<p>If you believe a child has supplied personal data inappropriately, contact legal@konvertira.com with minimal information so the matter can be assessed. Contractual capacity, parental authority and the GDPR rules for consent-based online services are separate questions. This notice does not invent a universal age threshold or use consent as the default basis for every conversion. The operator must consider suitable measures and legal requirements for the actual audience before release.</p>"
+      ]
+    },
+    {
+      "id": "incidents",
+      "title": "23. Personal-data breaches and incident handling",
+      "body": [
+        "<p>Suspected exposure, unauthorised access or a security defect can be reported to legal@konvertira.com. Include the affected feature and a safe description; do not circulate live result links or send other users' content. The operator must assess incidents, contain harm where possible, record relevant facts and preserve only information necessary for investigation and applicable legal obligations.</p>",
+        "<p>Where GDPR notification conditions are met, the competent supervisory authority must be notified without undue delay and, where feasible, within 72 hours of awareness; affected individuals must be informed without undue delay where a high risk triggers that duty, subject to lawful exceptions. This is an explanation of legal duties, not a claim of a staffed 24/7 response centre or guaranteed discovery time. A documented practical incident procedure and provider notification channels still require verification before publication.</p>"
+      ]
+    },
+    {
+      "id": "automation",
+      "title": "24. Automated processing, not individual decision-making",
+      "body": [
+        "<p>Conversion, page selection, metadata extraction and background segmentation are automated transformations of the supplied file. The inspected service does not use those outputs to decide eligibility, credit, employment, healthcare or another outcome producing legal or similarly significant effects on a person. Ordinary file automation should not be confused with GDPR Article 22 automated individual decision-making.</p>",
+        "<p>Rate and capacity checks can automatically reject a request for operational reasons; they are not a profile-based judgment about the person shown in an image or named in a document. If a consequential decision-making feature were proposed later, its legal basis, transparency and safeguards would need separate assessment. Users must not interpret current output as an authorised decision about an individual.</p>"
+      ]
+    },
+    {
+      "id": "required-data",
+      "title": "25. What happens if data is not supplied",
+      "body": [
+        "<p>You can read public information without submitting a file. A server operation needs the selected input and necessary parameters; without them the transformation cannot be provided. Local tools avoid sending image bytes but still need the file on your device to work. No public registration or payment details are required by the current product.</p>",
+        "<p>You can choose not to use a server-backed feature, select an appropriate local tool or use other software. Withholding optional correspondence details can limit support, while a rights request should require only what is reasonably necessary to identify the matter and verify identity. This notice does not require disclosure of unrelated personal data in exchange for access to a conversion.</p>"
+      ]
+    },
+    {
+      "id": "updates-contact",
+      "title": "26. Updates and privacy contact",
+      "body": [
+        "<p>This notice will need updating when verified provider arrangements, retention rules, processing purposes or features change. The revision date is shown above; appropriate additional notice will be given for material changes where required. Updating a notice does not itself create a lawful basis for new processing or establish valid consent. Outstanding facts must be resolved, not silently treated as established through publication.</p>",
+        "<p>Privacy contact: Matej Tokić, Croatia, <a href=\"mailto:legal@konvertira.com\">legal@konvertira.com</a>. See the <a href=\"/terms\">Terms of Service</a>, <a href=\"/security\">Security &amp; Data Handling</a>, <a href=\"/support\">Support</a> and <a href=\"/about\">About</a> pages for related information. This draft is not a legal opinion or guarantee of GDPR compliance; the pre-publication requirements above remain essential.</p>"
+      ]
+    }
+  ]
+}

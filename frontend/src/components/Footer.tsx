@@ -16,6 +16,7 @@ export function Footer() {
             <Link className="footer-link" to="/metadata">Metadata</Link>
             <Link className="footer-link" to="/privacy">Privacy</Link>
             <Link className="footer-link" to="/terms">Terms</Link>
+            <Link className="footer-link" to="/security">Security &amp; Data Handling</Link>
             <Link className="footer-link" to="/support">Support</Link>
             <Link className="footer-link" to="/about">About</Link>
             <a className="footer-link" href="https://github.com/bijesnopile/konvertira" target="_blank" rel="noopener noreferrer">GitHub</a>

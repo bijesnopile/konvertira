@@ -8,8 +8,9 @@ const pageMetadata: Record<string, { title: string; description: string }> = {
   '/convert': { title: 'File converters — Konvertira', description: 'Convert supported images, documents, spreadsheets, and presentations with clear local or server processing labels.' },
   '/pdf-tools': { title: 'PDF tools — Konvertira', description: 'Merge, split, reorder, extract, rasterize, create, optimize, and inspect PDFs with bounded server processing.' },
   '/metadata': { title: 'Metadata privacy tools — Konvertira', description: 'Inspect supported file metadata and create a cleaned copy with explicit privacy limitations.' },
-  '/privacy': { title: 'Privacy — Konvertira', description: 'Learn which Konvertira workflows stay in your browser and which use temporary server processing.' },
-  '/terms': { title: 'Terms — Konvertira', description: 'Terms for using Konvertira file conversion and metadata tools.' },
+  '/privacy': { title: 'Privacy Policy — Konvertira', description: 'Konvertira personal-data handling, local and server processing, retention, legal bases and privacy rights.' },
+  '/terms': { title: 'Terms of Service — Konvertira', description: 'Terms for using Konvertira file conversion and metadata tools, with mandatory consumer rights preserved.' },
+  '/security': { title: 'Security & Data Handling — Konvertira', description: 'Konvertira processing boundaries, implemented security controls and operational limitations.' },
   '/support': { title: 'Support — Konvertira', description: 'Get help with Konvertira formats, limits, privacy, and technical issues.' },
   '/about': { title: 'About — Konvertira', description: 'About Konvertira, an independent privacy-focused file tools project.' },
 }
