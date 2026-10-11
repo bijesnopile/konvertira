@@ -23,7 +23,7 @@ Evidence reviewed: [config.py](../../config.py), [storage](../../backend/service
 [local images](../../frontend/src/services/localImageProcessor.ts),
 [Compose](../../docker-compose.yml), [backend Dockerfile](../../backend/Dockerfile),
 [frontend Dockerfile](../../frontend/Dockerfile) and [Nginx](../../frontend/nginx.conf).
-Current public draft sources: [Privacy](../../frontend/src/legal/privacy.json),
+Current public notice sources: [Privacy](../../frontend/src/legal/privacy.json),
 [Terms](../../frontend/src/legal/terms.json), [Security](../../frontend/src/legal/security.json).
 
 - Browser-labelled JPG/PNG/static WebP work stays local without upload fallback.
@@ -39,8 +39,11 @@ Current public draft sources: [Privacy](../../frontend/src/legal/privacy.json),
   errors can leave physical files, not permission to download them. Legacy entries
   without metadata are unavailable and remain eligible for age-based cleanup.
   See [download security details](../storage-downloads.md) for clock, migration
-  and already-started transmission limitations. This is local implementation
-  evidence, not confirmation that production has deployed or exercised the fix.
+  and already-started transmission limitations. The operator confirms deployment
+  on Contabo, 92 Linux storage/download and 41 Linux PDF API/MCP tests passing,
+  both health endpoints HTTP 200, successful metadata inspection/removal, and a
+  harmless MCP download HTTP 200 before expiry / HTTP 404 afterwards. These
+  reported checks are not fresh remote tests here or proof of physical all-copy deletion.
 - Results use random bearer tokens and mode 0600; possession of a URL gives access
   while available. Secure deletion/physical overwriting is not implemented.
 - MCP retrieval validates HTTPS, standard port, no embedded credentials and
@@ -72,7 +75,7 @@ Current public draft sources: [Privacy](../../frontend/src/legal/privacy.json),
 | Cloudflare Logpush | Optional export of technical logs | Provider/export destination if enabled | Operator: not subscribed to or configured (inactive) | No configured Logpush export; does not erase provider request logs | Verify subscription and jobs/destinations without copying identifiers | Historical/export copies or other logging features not established |
 | Contabo Auto Backup | Customer-facing VPS recovery feature if enabled | Contabo hosting; operator customer account | Operator: disabled; Contabo DPA concluded; VPS panel EU region | No enabled customer Auto Backup; **not proof of absence of provider-managed copies** | Verify panel state and relevant provider retention/recovery terms | Provider-level mechanisms, retention, access locations/transfers, exact data-center country unconfirmed |
 | Contabo customer snapshots | Customer-created recovery copies | Contabo account | Operator: panel shows no customer snapshots | No shown customer snapshot to delete; distinguish infrastructure mechanisms | Confirm panel state, future creation and scope | Provider-managed recovery copies and historical deletions not established |
-| Support/legal email | Enquiries, requests, complaints; sender/contact, message, attachments | Operator-selected email provider/mailboxes | Public addresses legal@konvertira.com and support@konvertira.com; no provider/schedule verified | Purpose-based owner schedule must be established; minimise attachments, sent/trash/export copies | Test delivery/monitoring with harmless messages; inventory provider and mailbox policies | Provider, access, retention, backup and transfer arrangements; no invented email deletion interval |
+| Support/legal email | Enquiries, requests, complaints; sender/contact, message, attachments | Cloudflare Email Routing → Google Gmail; operator correspondence | Operator manually tested both public addresses; incoming delivery succeeded; no fixed retention schedule verified | Purpose-based owner schedule must be established; minimise attachments, sent/trash/export copies | Repeat harmless delivery/monitoring checks; review mailbox/provider policies | Roles, Google agreement status, access, retention, backups and transfers unverified; no separate Google DPA or EU-only Gmail claim; mailbox deletion does not erase all provider/export/recipient copies |
 | GDPR request records | Accountability and responses; minimal contact/reference, decisions/actions | Private access-controlled store outside Git; store not yet selected/verified | This task drafts a blank register only, not a live implementation | Case-specific purpose/legal obligation/claims justification, review/deletion date; remove unnecessary verification material | Adopt storage/access/schedule, exercise synthetic request, review closure and deletion | Actual owner acceptance, location/security and legally justified duration unresolved |
 | Incident records/evidence | Risk/notification decisions, investigation/remedies; minimal technical/personal facts | Private restricted store outside Git; incident evidence separately protected | This task drafts register/playbook only; no real incident/evidence included | Article 33(5) documentation where applicable; justified record/evidence review, narrow holds and deletion | Adopt safe evidence process, run synthetic tabletop, verify access and eventual deletion | Actual retention duration, absence cover, provider escalation and legal review unresolved |
 
@@ -104,6 +107,6 @@ not verify today's cleanup or all licences. Native/OS notices and broader
 licensing review remain distinct from personal-data retention.
 
 Inventory changes require owner review of actual settings and related disclosures,
-not automatic changes to production. Unknown email/provider retention, transfers,
+not automatic changes to production. Unknown email-specific contracts/roles, provider retention, transfers,
 edge cookies, data-subject handling tests, registration/identity obligations and
 final legal review stay open. Principles: [GDPR Articles 5 and 32](https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng).

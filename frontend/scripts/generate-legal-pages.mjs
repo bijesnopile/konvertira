@@ -9,8 +9,8 @@ const related = '<a href="/terms">Terms of Service</a><a href="/privacy">Privacy
 for (const slug of ['privacy', 'terms', 'security']) {
   const document = JSON.parse(readFileSync(new URL(`../src/legal/${slug}.json`, import.meta.url), 'utf8'))
   const article = `<article class="legal-content legal-document" aria-labelledby="legal-title">
-<header class="legal-intro"><p class="eyebrow">Konvertira legal information</p><h1 id="legal-title">${escape(document.title)}</h1><p class="legal-updated">Draft revision: ${escape(document.updated)}</p><p>${escape(document.summary)}</p></header>
-<aside class="legal-note" aria-label="Pre-publication requirements"><p>${escape(document.reviewNotice)}</p></aside>
+<header class="legal-intro"><p class="eyebrow">Konvertira legal information</p><h1 id="legal-title">${escape(document.title)}</h1><p class="legal-updated">Last updated: ${escape(document.updated)}</p><p>${escape(document.summary)}</p></header>
+<aside class="legal-note" aria-label="Important information"><p>${escape(document.reviewNotice)}</p></aside>
 <nav class="legal-toc" aria-label="Table of contents"><h2>Contents</h2><ol>${document.sections.map((section) => `<li><a href="#${escape(section.id)}">${escape(section.title)}</a></li>`).join('')}</ol></nav>
 ${document.sections.map((section) => `<section aria-labelledby="${escape(section.id)}"><h2 id="${escape(section.id)}">${escape(section.title)}</h2><div>${section.body.join('\n')}</div></section>`).join('\n')}
 <nav class="legal-related" aria-label="Related legal pages">${related}</nav>

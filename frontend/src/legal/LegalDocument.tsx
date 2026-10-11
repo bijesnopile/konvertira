@@ -14,10 +14,10 @@ export function LegalDocument({ slug }: { slug: LegalSlug }) {
       <header className="legal-intro">
         <p className="eyebrow">Konvertira legal information</p>
         <h1 id="legal-title">{document.title}</h1>
-        <p className="legal-updated">Draft revision: {document.updated}</p>
+        <p className="legal-updated">Last updated: {document.updated}</p>
         <p>{document.summary}</p>
       </header>
-      <aside className="legal-note" aria-label="Pre-publication requirements"><p>{document.reviewNotice}</p></aside>
+      <aside className="legal-note" aria-label="Important information"><p>{document.reviewNotice}</p></aside>
       <nav className="legal-toc" aria-label="Table of contents">
         <h2>Contents</h2>
         <ol>{document.sections.map((section) => <li key={section.id}><a href={`#${section.id}`}>{section.title}</a></li>)}</ol>

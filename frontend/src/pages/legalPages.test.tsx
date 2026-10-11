@@ -75,11 +75,12 @@ describe('crawler-readable legal pages', () => {
   }
 
   for (const [slug, document] of Object.entries(legalDocuments)) {
-    it(`${slug} has a complete linked contents list and explicitly labelled review requirements`, () => {
+    it(`${slug} has a complete linked contents list and professional final-document presentation`, () => {
       const html = read(`../../public/${slug}.html`)
       expect(html).toContain('aria-label="Table of contents"')
-      expect(html).toContain('PRE-PUBLICATION')
-      expect(html).toContain('Draft revision: October 11, 2026')
+      expect(html).toContain('aria-label="Important information"')
+      expect(html).not.toMatch(/PRE-PUBLICATION|Draft revision|this draft|before publication|before release|not a legal opinion/i)
+      expect(html).toContain('Last updated: October 11, 2026')
       expect(html).not.toMatch(/\b(?:TODO|TBD|Lorem ipsum|INSERT ADDRESS|YOUR COMPANY)\b/)
       const toc = html.match(/<nav class="legal-toc"[\s\S]*?<\/nav>/)?.[0] ?? ''
       expect(hrefs(toc)).toEqual(document.sections.map((section) => `#${section.id}`))
@@ -111,7 +112,7 @@ describe('crawler-readable legal pages', () => {
 
   it('preserves GDPR, consumer and retention limitations rather than claiming compliance', () => {
     const privacy = text(read('../../public/privacy.html'))
-    for (const phrase of ['Article 6(1)(b)', 'Article 6(1)(f)', 'Article 6(1)(c)', 'Article 6(1)(a)', 'Article 9', 'Article 14', 'Chapter V', 'one month', 'AZOP', 'approximately 15 minutes', 'not a blanket basis', 'not an exact-second', 'not a legal opinion']) expect(privacy).toContain(phrase)
+    for (const phrase of ['Article 6(1)(b)', 'Article 6(1)(f)', 'Article 6(1)(c)', 'Article 6(1)(a)', 'Article 9', 'Article 14', 'Chapter V', 'one month', 'AZOP', 'approximately 15 minutes', 'not a blanket basis', 'not an exact-second']) expect(privacy).toContain(phrase)
     const terms = text(read('../../public/terms.html'))
     for (const phrase of ['gross negligence', 'intentional misconduct', 'mandatory consumer', 'not required', 'no consumer indemnity', 'Croatia']) expect(terms).toContain(phrase)
     expect(terms).not.toMatch(/EUR\s*(0|100)\b|class-action waiver|waive all rights/)
@@ -162,8 +163,40 @@ describe('crawler-readable legal pages', () => {
     const checklist = read('../../../docs/legal-review-checklist.md')
     expect(checklist).toContain('## Verified and completed')
     expect(checklist).toContain('## Still requires confirmation')
-    for (const phrase of ['- [ ] Legally required operator identification', '- [ ] Applicability of business/trade registration', '- [ ] Final Croatian/EU-qualified legal review', '- [ ] Actual email provider', '- [ ] Cookie behaviour at the live edge', '- [ ] Practical data-subject request', '- [ ] Complete third-party licensing review']) expect(checklist).toContain(phrase)
+    for (const phrase of ['- [ ] Legally required operator identification', '- [ ] Applicability of business/trade registration', '- [ ] Final Croatian/EU-qualified legal review', '- [ ] Email-specific retention', '- [ ] Cookie behaviour at the live edge', '- [ ] Practical data-subject request', '- [ ] Complete third-party licensing review']) expect(checklist).toContain(phrase)
     expect(checklist).toContain('operator confirmation')
+  })
+
+  it('distinguishes confirmed email delivery from unverified arrangements', () => {
+    const privacy = text(read('../../public/privacy.html'))
+    for (const phrase of ['Cloudflare Email Routing', 'Google Gmail', 'manually tested both addresses', 'sender email addresses and names', 'technical email metadata', 'attachments voluntarily submitted', 'no separately signed Google DPA', 'No fixed number of days', 'Deleting a message from the mailbox does not establish deletion']) expect(privacy).toContain(phrase)
+    expect(privacy).not.toContain('provider identity and mailbox retention rules require deployment confirmation')
+  })
+
+  it('limits the cookie observation to the inspected incognito homepage', () => {
+    const privacy = text(read('../../public/privacy.html'))
+    for (const phrase of ['fresh Chrome incognito session', 'cookie table was empty during that inspection', 'not proof that Konvertira or Cloudflare never sets cookies', 'necessary security or challenge-related cookies', 'Logpush', 'RUM']) expect(privacy).toContain(phrase)
+  })
+
+  it('separates expired access denial, physical cleanup and already-started downloads', () => {
+    for (const slug of ['privacy', 'terms', 'security']) {
+      const page = text(read(`../../public/${slug}.html`))
+      expect(page).toMatch(/persisted (?:creation\/expiry|expiry)/i)
+      expect(page).toMatch(/(?:subsequent download requests|subsequent requests|subsequent downloads)/i)
+      expect(page).toMatch(/even if (?:physical deletion|deletion|unlink) fails/i)
+      expect(page).toMatch(/already started while valid may finish after expiry/i)
+      expect(page).toContain('OpenAI')
+      expect(page).not.toMatch(/from the stored file's modification time|unavailable through downloads after cleanup/)
+    }
+  })
+
+  it('does not introduce private identifiers or non-public email addresses', () => {
+    for (const slug of ['privacy', 'terms', 'security']) {
+      const page = read(`../../public/${slug}.html`)
+      const emails = page.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) ?? []
+      expect(emails.every((email) => ['legal@konvertira.com', 'support@konvertira.com'].includes(email))).toBe(true)
+      expect(page).not.toMatch(/\b(?:OIB|VAT)\s*[:#]\s*\w+|\bsk-[a-zA-Z0-9]{20,}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|@gmail\.com/i)
+    }
   })
 
   it('links security in the React footer, metadata and sitemap without changing robots', () => {

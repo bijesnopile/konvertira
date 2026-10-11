@@ -54,8 +54,11 @@ private account identifiers, environment values or server credentials were read.
   provider access locations and relevant international-transfer mechanisms;
   exact VPS data-center country if legally relevant. DPAs are not proof that all
   transfers/access or every provider activity have been fully assessed.
-- [ ] Actual email provider, handling, retention, agreements and mailbox operation.
-- [ ] Cookie behaviour at the live edge and any required ePrivacy disclosures.
+- [ ] Email-specific retention, contractual roles/agreements, access locations,
+  transfers and mailbox monitoring/absence arrangements; routing/delivery confirmed.
+- [ ] Cookie behaviour at the live edge in returning sessions, challenges and
+  other routes, and any required ePrivacy disclosures; one fresh homepage
+  incognito inspection had an empty cookie table, not a never-cookies finding.
 - [ ] Practical data-subject request and incident-response procedures.
 - [ ] Complete third-party licensing review for shipped wheels, native/OS
   components and historical images, including GCC Runtime Library Exception
@@ -64,9 +67,24 @@ private account identifiers, environment values or server credentials were read.
 Detailed open assessments below remain applicable. Confirmed items must not be
 reopened as wholly unknown, nor used to mark broader legal questions complete.
 
+## Latest operator confirmations — email, cookies and deployed expiry fix
+
+- [x] Both public addresses manually tested: sender → Cloudflare Email Routing
+  → Google Gmail; incoming delivery succeeded. Retention, contractual roles,
+  Google agreement status and transfers are not verified; no separate Google DPA asserted.
+- [x] Fresh Chrome incognito homepage: DevTools Application → Cookies for
+  https://konvertira.com showed an empty table during inspection. Other conditions
+  may involve necessary Cloudflare security/challenge cookies.
+- [x] Updated backend and MCP deployed on Contabo; operator reports **92 Linux
+  storage/download tests passed** and **41 Linux backend PDF API/MCP tests passed**.
+  Both public health endpoints returned HTTP 200; metadata inspection/removal
+  succeeded. Harmless MCP result: HTTP 200 before expiry, HTTP 404 afterwards.
+  Automated tests cover expiry denial when physical unlink fails. These are
+  operator confirmations, not remote tests performed in this editing session.
+
 ## Internal procedures — drafted, not operationally verified
 
-Local expired-download fix: token resolution and actual descriptor-backed delivery
+Deployed expired-download fix (operator-confirmed): token resolution and actual descriptor-backed delivery
 now check persistent expiry metadata independently of physical unlink. Startup
 and periodic cleanup remain space recovery, not the access security boundary.
 Legacy results without the new record are denied. See
@@ -74,15 +92,11 @@ Legacy results without the new record are denied. See
 This does not verify production cleanup, change provider/log retention, settle
 legal gates or mean the internal procedures have been operationally tested.
 
-Separate public-copy review required (not changed by this fix):
-`frontend/src/legal/privacy.json`, section `temporary-storage`, paragraphs 1–2,
-still describes mtime and availability after cleanup; section `retention-table`
-also describes TTL plus scheduling. Propose creation/expiry metadata and access
-denial at response start independent of cleanup, while preserving physical-copy
-caveats. `frontend/src/legal/security.json`, section `logging-deletion`, paragraph
-3 describes cleanup on relevant requests; propose distinguishing resolution-time
-expired cleanup from scheduled full-store cleanup. Generated public HTML should
-only be regenerated after a separate reviewed wording change, not in this task.
+Public copy updated locally: Privacy temporary storage/retention table, Terms
+storage and Security results/logging now separate persisted expiry/access denial
+from physical cleanup. Already-started valid downloads may finish; provider,
+browser, OpenAI and recipient copies are separate. Static HTML regenerated from
+the same source as React; this is not a frontend publication.
 
 Five internal templates were drafted on October 11, 2026:
 [GDPR requests](internal/GDPR_REQUESTS.md),
@@ -107,6 +121,13 @@ retention, transfers and broader licensing gates remain unresolved and unchanged
 
 ## Release blockers and controller identity
 
+Public identification is limited to Matej Tokić, Croatian independent-natural-person
+status, Konvertira and public legal/support contacts. No private address, OIB/VAT,
+business identifier, phone or invented company may be added. These minimal facts
+do not necessarily satisfy Croatian/EU disclosure obligations. Qualified review
+must resolve required identification, lawful contact/service address, registration
+and complaint duties before treating publication as legally complete.
+
 - [ ] Obtain Croatian/EU-qualified legal review of all three original English
   drafts, especially controller roles, consumer remedies and Terms section 22's
   narrowly qualified non-consumer loss exclusion. No numerical liability cap,
@@ -121,19 +142,18 @@ retention, transfers and broader licensing gates remain unresolved and unchanged
 - [ ] Determine whether a registered trade/company identity, business register,
   OIB/VAT identifier, telephone number or further Croatian e-commerce/operator
   disclosure must be displayed for the actual operator. Do not invent them.
-- [ ] Verify both existing mailboxes (`legal@konvertira.com` and
-  `support@konvertira.com`) are controlled, monitored and able to receive notices.
+- [x] Operator manually verified incoming delivery to Gmail for both public addresses.
+- [ ] Verify monitored mailbox access, checking habits and absence coverage.
 - [ ] Determine whether a GDPR DPO is required (Article 37). Do not invent an
   appointment. Determine Article 27 representative applicability; a Croatia-based
   establishment ordinarily presents a different question from a non-EU operator,
   but actual establishment and any exceptions must be assessed.
 - [ ] Resolve remaining provider-level retention, access and transfer disclosures.
-  Hosting, DPAs and local logging controls are confirmed above; public draft
-  notices now distinguish those facts from outstanding information.
-  Replace them with verified information only after review; do not just remove
-  the warnings to make the pages appear complete.
+  Hosting, applicable DPAs, logging and incoming email routing are confirmed.
+  Public notices retain substantive limits; unresolved legal identification stays
+  in this checklist. Final-document styling does not establish legal completeness.
 - [ ] Set the real effective/publication dates and any required change notice or
-  record of the previous policies. Current dates are labelled draft revisions,
+  record of the previous policies. Current dates are labelled Last updated for local copy,
   not a representation of a completed production rollout.
 
 ## Code-backed facts reviewed
@@ -150,7 +170,7 @@ retention, transfers and broader licensing gates remain unresolved and unchanged
 | Packages | `backend/services/metadata.py` | Bounded metadata archive parsing, encrypted/traversal checks, hardened XML; not a universal safety guarantee for all engines. |
 | Runtime | `docker-compose.yml`, both Dockerfiles | Non-root backend/MCP, dropped capabilities, no-new-privileges, loopback bindings and named volumes. The network named internal is a bridge, not `internal: true`. Frontend is not claimed non-root. No read-only rootfs/cgroup budgets asserted. |
 | Background removal | Processor, preparation/permission scripts, `docs/background-removal.md`, bundled Apache licence | U²-NetP, fixed URL/hash, CPU ONNX session, default one inference thread, no runtime download or external inference API, no training on uploads. |
-| Browser tracking | `frontend/src/`, public assets and Nginx inspection; operator confirmation | No frontend Google/advertising analytics or persistent user profiles. Cloudflare RUM disabled; request analytics/logs still available. Live edge cookies remain unknown. |
+| Browser tracking | `frontend/src/`, public assets and Nginx inspection; operator confirmation | No frontend Google/advertising analytics or persistent user profiles. Cloudflare RUM disabled; request analytics/logs still available. One fresh homepage incognito table was empty; other scenarios remain unverified. |
 
 The requested `docker-compose.prod.yml` does **not** exist in this checkout;
 `docker-compose.yml` is the available source. No Caddy configuration or domain
@@ -190,7 +210,8 @@ facts by a hostname, documentation recommendation or provider brand.
 - [x] Confirm Contabo hosting, EU panel region, concluded DPA and customer-facing
   backup/snapshot state. Contracting entity, support/admin-access territories,
   exact country and provider-level recovery/retention remain to be established.
-- [ ] Inventory email, DNS, proxy, monitoring, logging and any other providers.
+- [ ] Complete provider inventory/role review for confirmed Cloudflare Email
+  Routing → Google Gmail, DNS, proxy, monitoring, logging and other providers.
   Distinguish code dependencies from hosted services receiving personal data.
 - [ ] Review provider contracts/DPA terms, controller/processor roles and
   subprocessors. Do not classify every third party automatically as a processor.
@@ -226,8 +247,9 @@ facts by a hostname, documentation recommendation or provider brand.
 
 ## Cookies and production security
 
-- [ ] Inspect actual public responses/browser storage with fresh and returning
-  sessions, including any Cloudflare challenge cookies or injected analytics.
+- [x] Operator inspected fresh Chrome incognito homepage cookies: empty table.
+- [ ] Inspect returning sessions, other routes and security/challenge responses,
+  including any Cloudflare cookies or injected analytics.
 - [ ] Determine applicable ePrivacy/Croatian terminal-storage requirements; provide
   disclosures and prior choice for non-essential tracking where required. The
   absence of frontend trackers does not prove an edge provider sets no cookies.
@@ -485,3 +507,30 @@ files changed. No production/Cloudflare settings changed. No fresh remote health
 Docker, browser or deployment checks were performed for this wording update;
 operator-confirmed deployed checks are explicitly recorded separately above.
 No commit, push, deployment, publication or plugin submission was performed.
+
+## Final legal pages update — local verification, October 11, 2026
+
+Changed only the three legal JSON sources and generated HTML counterparts,
+LegalDocument.tsx and the static generator (Last updated / Important information),
+legalPages.test.tsx, this checklist, DATA_RETENTION.md and
+PRIVACY_SECURITY_CHECKLIST.md. Other internal procedures and application
+API/MCP/configuration/security settings were unchanged.
+
+Email and cookie disclosures separate operator-confirmed observations from
+unverified provider contracts, retention and other scenarios. Public operator
+information stays limited to supplied details; no private identifiers, actual
+messages, mailbox address/account IDs or credentials were added. Official email
+references: [Cloudflare routing](https://www.cloudflare.com/learning/email-security/what-is-email-routing/)
+and [Google privacy](https://policies.google.com/privacy); these do not establish
+account-specific contracts or a signed Google DPA.
+
+Local validation: legal:generate and legal:check passed; npm test **50 passed,
+8 test files passed** (28 legal-page tests, including static/React text/link/ID
+parity); typecheck and production build passed. An initial secret-pattern test
+false-positive on the existing words “private keys” was narrowed to actual key
+headers and rerun successfully. git diff --check passed (only LF/CRLF warnings).
+
+Technically ready for frontend deployment, not a certification of legal readiness.
+Identification/contact-address, registration/consumer duties, provider retention,
+roles/transfers, scenario-specific cookies, operational procedures and licensing
+review remain open. No commit, push, deployment or plugin submission in this task.

@@ -9,6 +9,20 @@ Related: [requests](GDPR_REQUESTS.md), [incidents](INCIDENT_RESPONSE.md),
 [retention](DATA_RETENTION.md), [templates](RESPONSE_TEMPLATES.md),
 [publication gates](../legal-review-checklist.md).
 
+## Confirmed observations, not routine adoption
+
+The operator manually tested both public mail addresses: incoming messages pass
+through Cloudflare Email Routing to Google Gmail. One fresh Chrome incognito
+homepage cookie table was empty; challenge/returning/other-route behaviour remains
+unverified. RUM injection is disabled, Logpush inactive; technical HTTP logs remain.
+
+The operator confirms backend/MCP deployment, 92 Linux storage/download and
+41 Linux PDF API/MCP tests passing, both health endpoints HTTP 200, successful
+metadata operations, and a harmless MCP result HTTP 200 before expiry / HTTP 404
+afterwards. Tests include expired denial despite failed unlink. None of this
+establishes physical all-copy deletion, adopted mailbox monitoring, a GDPR request
+exercise, incident tabletop or final legal review.
+
 ## Before adoption
 
 - [ ] Owner accepts responsibility and records who can act during absence, without
@@ -17,7 +31,7 @@ Related: [requests](GDPR_REQUESTS.md), [incidents](INCIDENT_RESPONSE.md),
 - [ ] Select a private access-controlled record/evidence store outside Git/web
   roots; establish secure access/delivery, retention review and recovery. Store
   credentials only in an appropriate separate credential manager, not these docs.
-- [ ] Verify legal/support mailbox access/delivery, provider assistance and current
+- [ ] Verify ongoing legal/support monitored mailbox access, provider assistance and current
   authority submission channels. Record necessary contacts privately.
 - [ ] Confirm actual production mounts, effective TTL, cleanup and logging settings;
   source defaults and past provider panel confirmations are not live assurance.
@@ -39,7 +53,8 @@ Related: [requests](GDPR_REQUESTS.md), [incidents](INCIDENT_RESPONSE.md),
   responsiveness signal, not proof of every engine, model or cleanup worker.
 - [ ] Check both result stores using counts, sizes and age metadata first. Use
   harmless test outputs to verify expiry/download unavailability after the actual
-  TTL and cleanup interval. Investigate overdue files/errors; do not mass-download
+  TTL independently of physical cleanup; already-started valid downloads may finish.
+  Check cleanup separately. Investigate overdue files/errors; do not mass-download
   user files or run wildcard deletion. Distinguish active jobs from orphan
   LibreOffice/upload temporary files before safe targeted recovery.
 - [ ] Review open request deadlines, provider follow-ups and incident actions.

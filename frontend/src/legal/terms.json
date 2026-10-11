@@ -3,7 +3,7 @@
   "title": "Terms of Service",
   "updated": "October 11, 2026",
   "summary": "Konvertira is currently offered without charge as an independently operated file-processing service. Choose the processing mode deliberately, keep your originals, and check every result. You retain your file rights; mandatory consumer and data-protection rights remain unaffected. This summary is a guide; the full Terms below govern subject to applicable law.",
-  "reviewNotice": "PRE-PUBLICATION LEGAL REQUIREMENT: The operator's legally required postal/service address and any applicable Croatian business identifiers must be confirmed and added before this draft is published. Consumer-information duties and these Terms require Croatian/EU-qualified legal review. No missing identity details are implied by this draft.",
+  "reviewNotice": "Mandatory consumer rights and other rights that cannot lawfully be excluded prevail over these Terms. Konvertira is currently free; this is not a promise of permanent free availability.",
   "sections": [
     {
       "id": "operator",
@@ -98,7 +98,7 @@
       "id": "not-storage",
       "title": "12. Not a storage or backup service",
       "body": [
-        "<p>Konvertira is not permanent storage, a file-sharing archive or a backup service. Many web operations return the result directly; MCP and certain compatibility routes temporarily store downloadable results. The default application result lifetime is approximately 15 minutes, with scheduled and request-triggered cleanup. Availability can end earlier because of failures or maintenance, and deletion timing is not a promise of exact-second erasure.</p>",
+        "<p>Konvertira is not permanent storage, a file-sharing archive or a backup service. Many web operations return the result directly; MCP and certain compatibility routes temporarily store downloadable results. The default application result lifetime is approximately 15 minutes, based on persisted creation/expiry records. Subsequent download requests after expiry are denied independently of physical cleanup, even if deletion fails. A download already started while valid may finish after expiry. Availability can end earlier because of failures or maintenance, and deletion timing is not a promise of exact-second erasure.</p>",
         "<p>Download results promptly and keep them yourself. Anyone who obtains a valid temporary download URL may be able to use it until expiry; do not post it publicly. Application expiry does not establish deletion from OpenAI, browser downloads, proxy logs, caches or infrastructure snapshots. The Privacy Policy distinguishes those systems and describes confirmed storage/logging controls and remaining provider-level questions.</p>"
       ]
     },
@@ -180,7 +180,7 @@
       "title": "22. Proportionate limitation of liability",
       "body": [
         "<p>Any responsibility for loss is assessed under applicable law, including causation, foreseeability, fault, reasonable mitigation and mandatory consumer protection. For non-consumer use only, and only where lawfully enforceable, the operator does not assume additional contractual liability for indirect commercial losses that were not reasonably foreseeable when the processing request was made. There is no arbitrary monetary cap, no exclusion of all file loss, and no consumer indemnity obligation.</p>",
-        "<p>No provision excludes or limits liability for fraud, intentional misconduct, gross negligence, death or personal injury where protected by law, unlawful personal-data processing, mandatory digital-service remedies, or any other liability that cannot lawfully be excluded. Consumer statutory rights prevail over inconsistent wording. Advice to keep backups is a precaution, not a release from liability. The scope and enforceability of the limited non-consumer exclusion require professional Croatian/EU legal review before publication.</p>"
+        "<p>No provision excludes or limits liability for fraud, intentional misconduct, gross negligence, death or personal injury where protected by law, unlawful personal-data processing, mandatory digital-service remedies, or any other liability that cannot lawfully be excluded. Consumer statutory rights prevail over inconsistent wording. Advice to keep backups is a precaution, not a release from liability.</p>"
       ]
     },
     {
@@ -196,7 +196,7 @@
       "title": "24. Complaints and rights notices",
       "body": [
         "<p>For technical issues use <a href=\"/support\">Support</a>. Written consumer complaints and intellectual-property notices may be sent to legal@konvertira.com. Identify the affected operation or material, your authority, the basis of the complaint and a way to reply. Do not include sensitive files or other users' live download tokens unless a secure and necessary method has first been agreed.</p>",
-        "<p>Complaints will be considered fairly, without requiring you to abandon court or regulator rights. Where Croatian statutory written-complaint duties apply, receipt must be acknowledged and a written response provided within the applicable deadline, including the 15-day period where required. The operator must verify the applicable complaint procedure and publish the required contact information before release. Reporting infringement does not automatically establish infringement or authorise disclosure of another user's data.</p>"
+        "<p>Complaints will be considered fairly, without requiring you to abandon court or regulator rights. Where Croatian statutory written-complaint duties apply, receipt must be acknowledged and a written response provided within the applicable deadline, including the 15-day period where required. Reporting infringement does not automatically establish infringement or authorise disclosure of another user's data.</p>"
       ]
     },
     {
@@ -228,7 +228,7 @@
       "title": "28. Contact and related information",
       "body": [
         "<p>Operator: Matej Tokić, Croatia. For legal matters, consumer complaints, privacy questions and rights requests, email <a href=\"mailto:legal@konvertira.com\">legal@konvertira.com</a>. For technical help, email <a href=\"mailto:support@konvertira.com\">support@konvertira.com</a>. Send only what is necessary to identify your concern; do not send confidential originals by default.</p>",
-        "<p>These Terms should be read alongside the <a href=\"/privacy\">Privacy Policy</a> and <a href=\"/security\">Security &amp; Data Handling</a> page. The <a href=\"/about\">About</a> and <a href=\"/support\">Support</a> pages remain available. The pre-publication notice above identifies missing operator details that must be resolved; this draft is not a legal opinion, certification or assurance of regulatory compliance.</p>"
+        "<p>These Terms should be read alongside the <a href=\"/privacy\">Privacy Policy</a> and <a href=\"/security\">Security &amp; Data Handling</a> page. The <a href=\"/about\">About</a> and <a href=\"/support\">Support</a> pages remain available.</p>"
       ]
     }
   ]
