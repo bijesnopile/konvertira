@@ -4,6 +4,8 @@ import type { OutputFormat, ProcessedFile } from '../types/conversion'
 import { downloadBlob } from '../utils/fileDownload'
 import { formatBytes } from '../utils/files'
 import { ProcessingModeBadge, ProcessingModeInfo } from './ProcessingMode'
+import { ProcessingAcknowledgement } from './ProcessingAcknowledgement'
+import { useProcessingAcknowledgement } from '../hooks/useProcessingAcknowledgement'
 import { CONVERSION_REGISTRY, formatFromFilename, formatFromMimeType } from '../formats/registry'
 
 const SERVER_INPUT_ACCEPT = '.jpg,.jpeg,.png,.webp,.heic,.heif,.avif,.gif,image/jpeg,image/png,image/webp,image/heic,image/heif,image/avif,image/gif'
@@ -19,6 +21,7 @@ export function ServerImageConverter() {
   const [targetKb, setTargetKb] = useState('')
   const [backgroundColor, setBackgroundColor] = useState('#ffffff')
   const [loading, setLoading] = useState(false)
+  const acknowledgement = useProcessingAcknowledgement(file ? [file] : [], JSON.stringify(['convert-image', format, quality, width, height, targetKb, backgroundColor]))
   const [error, setError] = useState<string>()
   const [result, setResult] = useState<ProcessedFile>()
 
@@ -26,6 +29,7 @@ export function ServerImageConverter() {
     const selected = event.target.files?.[0]
     event.target.value = ''
     if (!selected) return
+    acknowledgement.reset()
     setFile(selected)
     const source = formatFromFilename(selected.name) || formatFromMimeType(selected.type)
     const firstTarget = CONVERSION_REGISTRY.find((edge) => edge.source === source?.id && edge.executionModes.includes('server'))?.target
@@ -36,6 +40,7 @@ export function ServerImageConverter() {
 
   const process = async () => {
     if (!file || loading) return
+    if (!acknowledgement.guard()) return
     setLoading(true)
     setError(undefined)
     try {
@@ -80,7 +85,8 @@ export function ServerImageConverter() {
           <label className="text-sm font-semibold">Target size (KB)<input type="number" min="1" disabled={format === 'png'} placeholder="Best effort" value={targetKb} onChange={(event) => setTargetKb(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-300 p-3" /></label>
         </div>
         {format === 'jpg' && <label className="mt-4 block text-sm font-semibold">Transparency background<input type="color" value={backgroundColor} onChange={(event) => setBackgroundColor(event.target.value)} className="ml-3 h-9 w-14 align-middle" /></label>}
-        <button type="button" className="button-primary mt-5 w-full" disabled={!file || loading} onClick={() => void process()}>{loading ? 'Processing on the server…' : 'Upload and convert'}</button>
+        <ProcessingAcknowledgement {...acknowledgement} disabled={loading} />
+        <button type="button" className="button-primary mt-5 w-full" disabled={!file || loading || !acknowledgement.accepted} onClick={() => void process()}>{loading ? 'Processing on the server…' : 'Upload and convert'}</button>
         {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}
         {result && <div className="mt-5 rounded-xl bg-forest-50 p-4 text-sm text-forest-900"><p>{result.filename} · {formatBytes(result.blob.size)}{result.width && result.height ? ` · ${result.width} × ${result.height}` : ''}</p><button type="button" onClick={() => downloadBlob(result.blob, result.filename)} className="button-primary mt-3">Download</button></div>}
         <p className="mt-4 text-xs leading-5 text-slate-500">Animated GIF, AVIF, or WebP files are rejected rather than silently flattened. Conversion re-encodes pixels without intentionally copying source metadata; color-profile details may change.</p>

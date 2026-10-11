@@ -3,6 +3,8 @@ import { convertOffice } from '../services/api'
 import type { ProcessedFile } from '../types/conversion'
 import { downloadBlob } from '../utils/fileDownload'
 import { ProcessingModeBadge, ProcessingModeInfo } from './ProcessingMode'
+import { ProcessingAcknowledgement } from './ProcessingAcknowledgement'
+import { useProcessingAcknowledgement } from '../hooks/useProcessingAcknowledgement'
 
 const matrix: Record<string, string[]> = {
   xlsx: ['csv', 'ods', 'pdf'], xls: ['csv', 'xlsx', 'pdf'], ods: ['csv', 'xlsx', 'pdf'], csv: ['xlsx', 'ods'],
@@ -15,16 +17,18 @@ export function OfficeConverter() {
   const [result, setResult] = useState<ProcessedFile>()
   const [error, setError] = useState<string>()
   const [loading, setLoading] = useState(false)
+  const acknowledgement = useProcessingAcknowledgement(file ? [file] : [], `convert-office:${output}`)
   const extension = file?.name.split('.').pop()?.toLowerCase() || ''
   const options = matrix[extension] || []
   const choose = (event: ChangeEvent<HTMLInputElement>) => {
     const selected = event.target.files?.[0]
-    setFile(selected); setResult(undefined); setError(undefined)
+    acknowledgement.reset(); setFile(selected); setResult(undefined); setError(undefined)
     const next = selected?.name.split('.').pop()?.toLowerCase() || ''
     setOutput((matrix[next] || [])[0] || '')
   }
   const run = async () => {
-    if (!file || !output) return
+    if (!file || !output || loading) return
+    if (!acknowledgement.guard()) return
     setLoading(true); setError(undefined)
     try { setResult(await convertOffice(file, output)) }
     catch (caught) { setError(caught instanceof Error ? caught.message : 'Office conversion failed.') }
@@ -35,7 +39,8 @@ export function OfficeConverter() {
     <ProcessingModeInfo mode="server" title="Server conversion" description="Office conversion uses an isolated, time-limited LibreOffice process. Uploaded files are treated as untrusted and macros are not deliberately executed." className="mt-5 p-4" />
     <input type="file" accept=".xlsx,.xls,.ods,.csv,.pptx,.ppt,.odp" onChange={choose} className="file-picker mt-5" />
     {options.length > 0 && <label className="mt-4 block text-sm font-semibold">Output format<select value={output} onChange={(event) => setOutput(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-300 p-3">{options.map((value) => <option key={value}>{value.toUpperCase()}</option>)}</select></label>}
-    <button type="button" disabled={!file || !output || loading} onClick={() => void run()} className="button-primary mt-5 w-full">{loading ? 'Converting on the server…' : 'Convert file'}</button>
+    <ProcessingAcknowledgement {...acknowledgement} disabled={loading} />
+    <button type="button" disabled={!file || !output || loading || !acknowledgement.accepted} onClick={() => void run()} className="button-primary mt-5 w-full">{loading ? 'Converting on the server…' : 'Convert file'}</button>
     {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}
     {result && <div className="mt-4 rounded-xl bg-forest-50 p-4"><p className="text-sm text-forest-900">{result.filename}</p><button type="button" onClick={() => downloadBlob(result.blob, result.filename)} className="button-primary mt-3">Download</button></div>}
     <p className="mt-4 text-xs leading-5 text-slate-500">Workbook-to-CSV returns one CSV per sheet in a ZIP when needed. Styles, charts, formulas, macros, transitions and external links may change or be omitted.</p>

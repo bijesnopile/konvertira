@@ -3,6 +3,8 @@ import { inspectPdfMetadata, processPdf } from '../services/api'
 import type { ProcessedFile } from '../types/conversion'
 import { downloadBlob } from '../utils/fileDownload'
 import { ProcessingModeBadge, ProcessingModeInfo } from './ProcessingMode'
+import { ProcessingAcknowledgement } from './ProcessingAcknowledgement'
+import { useProcessingAcknowledgement } from '../hooks/useProcessingAcknowledgement'
 
 type PdfOperation = 'merge' | 'extract' | 'split' | 'reorder' | 'delete-pages' | 'to-images' | 'images-to-pdf' | 'inspect-metadata' | 'remove-metadata' | 'optimize'
 const operations: { id: PdfOperation; label: string; multi?: boolean; pages?: boolean }[] = [
@@ -26,14 +28,17 @@ export function PdfToolkit() {
   const [metadata, setMetadata] = useState<Record<string, unknown>>()
   const [error, setError] = useState<string>()
   const [loading, setLoading] = useState(false)
+  const acknowledgement = useProcessingAcknowledgement(files, JSON.stringify([operation, pages]))
   const selected = operations.find((item) => item.id === operation) ?? operations[0]
 
   const selectFiles = (event: ChangeEvent<HTMLInputElement>) => {
+    acknowledgement.reset()
     setFiles(Array.from(event.target.files || []))
     setResult(undefined); setMetadata(undefined); setError(undefined)
   }
   const run = async () => {
-    if (!files.length) return
+    if (!files.length || loading) return
+    if (!acknowledgement.guard()) return
     setLoading(true); setError(undefined); setResult(undefined); setMetadata(undefined)
     try {
       if (operation === 'inspect-metadata') {
@@ -56,7 +61,8 @@ export function PdfToolkit() {
     <label className="mt-5 block text-sm font-semibold">Operation<select value={operation} onChange={(event) => { setOperation(event.target.value as PdfOperation); setFiles([]); setResult(undefined); setMetadata(undefined) }} className="mt-2 w-full rounded-lg border border-slate-300 p-3">{operations.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
     <input className="file-picker mt-4" type="file" accept={operation === 'images-to-pdf' ? 'image/jpeg,image/png,image/webp,image/heic,image/avif' : 'application/pdf,.pdf'} multiple={selected.multi} onChange={selectFiles} />
     {selected.pages && <label className="mt-4 block text-sm font-semibold">{operation === 'reorder' ? 'Page order (example: 3,1,2)' : 'Pages (example: 1-3,5)'}<input value={pages} onChange={(event) => setPages(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-300 p-3" /></label>}
-    <button type="button" disabled={!files.length || loading} onClick={() => void run()} className="button-primary mt-5 w-full">{loading ? 'Processing on the server…' : 'Process PDF'}</button>
+    <ProcessingAcknowledgement {...acknowledgement} disabled={loading} />
+    <button type="button" disabled={!files.length || loading || !acknowledgement.accepted} onClick={() => void run()} className="button-primary mt-5 w-full">{loading ? 'Processing on the server…' : 'Process PDF'}</button>
     {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}
     {result && <div className="mt-4 rounded-xl bg-forest-50 p-4"><p className="text-sm text-forest-900">{result.filename}</p><button type="button" onClick={() => downloadBlob(result.blob, result.filename)} className="button-primary mt-3">Download</button></div>}
     {metadata && <dl className="mt-4 grid gap-2 rounded-xl bg-slate-50 p-4 text-sm">{Object.entries(metadata).map(([key, value]) => <div key={key}><dt className="font-semibold">{key.replaceAll('_', ' ')}</dt><dd className="break-words text-slate-600">{String(value ?? '—')}</dd></div>)}</dl>}

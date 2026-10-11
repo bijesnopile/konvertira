@@ -4,6 +4,8 @@ import { removeImageBackground } from '../services/api'
 import type { ProcessedFile } from '../types/conversion'
 import { downloadBlob } from '../utils/fileDownload'
 import { ProcessingModeBadge, ProcessingModeInfo } from './ProcessingMode'
+import { ProcessingAcknowledgement } from './ProcessingAcknowledgement'
+import { useProcessingAcknowledgement } from '../hooks/useProcessingAcknowledgement'
 
 const supported = FORMAT_REGISTRY.filter((format) => format.operationModes?.removeBackground?.includes('server'))
 
@@ -11,15 +13,18 @@ export function BackgroundRemoval() {
   const [file, setFile] = useState<File>()
   const [format, setFormat] = useState<'png' | 'webp'>('png')
   const [loading, setLoading] = useState(false)
+  const acknowledgement = useProcessingAcknowledgement(file ? [file] : [], `remove-background:${format}`)
   const [result, setResult] = useState<ProcessedFile>()
   const [error, setError] = useState<string>()
   const choose = (event: ChangeEvent<HTMLInputElement>) => {
+    acknowledgement.reset()
     setFile(event.target.files?.[0])
     setResult(undefined)
     setError(undefined)
   }
   const process = async () => {
     if (!file || loading) return
+    if (!acknowledgement.guard()) return
     setLoading(true)
     setResult(undefined)
     setError(undefined)
@@ -35,7 +40,8 @@ export function BackgroundRemoval() {
       <p className="mt-3 text-xs text-slate-500">{supported.map((format) => format.label).join(', ')} · Static images only · Up to 12 megapixels (server limit may vary)</p>
       <label className="mt-5 block text-sm font-semibold">Transparent output<select className="ml-3 rounded-xl border border-slate-300 p-3" value={format} disabled={loading} onChange={(event) => { setFormat(event.target.value as 'png' | 'webp'); setResult(undefined) }}><option value="png">PNG</option><option value="webp">WebP</option></select></label>
       <p className="mt-4 text-sm text-slate-600">Automatic segmentation may need refinement around hair, fur, shadows, glass, semi-transparent objects, or similar foreground and background colors. It does not guarantee anonymity or removal of visible sensitive information.</p>
-      <button className="button-primary mt-5 w-full" type="button" disabled={!file || loading} onClick={() => void process()}>{loading ? 'Removing background on the server…' : 'Upload and remove background'}</button>
+      <ProcessingAcknowledgement {...acknowledgement} disabled={loading} />
+      <button className="button-primary mt-5 w-full" type="button" disabled={!file || loading || !acknowledgement.accepted} onClick={() => void process()}>{loading ? 'Removing background on the server…' : 'Upload and remove background'}</button>
       {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}
       {result && <div className="mt-5 rounded-xl bg-forest-50 p-4 text-sm"><p>A new transparent image was created.</p><button type="button" className="button-primary mt-3" onClick={() => downloadBlob(result.blob, result.filename)}>Download result</button></div>}
     </div>
