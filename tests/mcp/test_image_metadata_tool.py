@@ -30,7 +30,7 @@ def test_remove_image_metadata_tool(monkeypatch, tmp_path, jpeg_with_metadata: b
     assert result.success is True
     assert result.filename == "clean_photo.jpg"
     assert result.content_type == "image/jpeg"
-    assert len(tuple(tmp_path.iterdir())) == 1
+    assert len(tuple(path for path in tmp_path.iterdir() if not path.name.startswith('.'))) == 1
     assert mcp_resource_limits.active_jobs == 0
 
 

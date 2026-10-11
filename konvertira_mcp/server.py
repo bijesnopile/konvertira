@@ -5,15 +5,15 @@ from contextlib import asynccontextmanager, suppress
 from typing import AsyncIterator
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import Response, JSONResponse
 from mcp.server import MCPServer
 from mcp.server.transport_security import TransportSecuritySettings
 from mcp.types import ToolAnnotations
 
-from backend.utils.mime import content_type_for_path
 from backend.services.resource_limits import McpRateLimitError, mcp_resource_limits
 from backend.services.security import enforce_general_rate
 from backend.services.storage import cleanup_periodically
+from backend.services.result_downloads import ResultDownloadResponse, download_error
 from config import settings
 from konvertira_mcp.tools.image_metadata import mcp_storage, remove_image_metadata
 from konvertira_mcp.tools.workflows import (
@@ -165,6 +165,8 @@ def create_app() -> FastAPI:
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "no-referrer")
         response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+        if request.url.path.startswith("/download/"):
+            response.headers["Cache-Control"] = "no-store"
         return response
 
     application.mount("/mcp", mcp_http_app)
@@ -193,18 +195,12 @@ def create_app() -> FastAPI:
         }
 
     @application.get("/download/{token}")
-    async def download_result(token: str, request: Request) -> FileResponse:
-        enforce_general_rate(request)
-        mcp_storage.cleanup()
-        file_path = mcp_storage.resolve(token)
-        if file_path is None:
-            raise HTTPException(status_code=404, detail="File is no longer available.")
-        return FileResponse(
-            path=file_path,
-            media_type=content_type_for_path(file_path.suffix),
-            filename=f"konvertira-cleaned{file_path.suffix}",
-            headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"},
-        )
+    async def download_result(token: str, request: Request) -> Response:
+        try:
+            enforce_general_rate(request)
+        except HTTPException as exc:
+            return download_error(exc)
+        return ResultDownloadResponse(mcp_storage, token, "File is no longer available.")
 
     return application
 

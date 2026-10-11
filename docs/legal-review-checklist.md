@@ -5,14 +5,115 @@ legally complete until the blockers below are resolved.** This is an engineering
 evidence record and review checklist, not a legal opinion or GDPR/licence audit.
 An unchecked item is unknown or unconfirmed, not a negative answer.
 
+## Verified and completed — final disclosure update
+
+Evidence boundary: production/account facts below were expressly confirmed by
+the operator in the final documentation task on October 11, 2026. They are not
+represented as fresh remote checks performed during this local editing session.
+Repository-backed processing facts were checked against current source. No
+private account identifiers, environment values or server credentials were read.
+
+- [x] Operator: Matej Tokić, independent natural person based in Croatia, not
+  currently operating through a registered company or trade. This factual status
+  does not settle legally mandatory disclosures or registration obligations.
+- [x] Currently no subscriptions, advertising, paid credits, checkout or other
+  implemented monetisation; no promise of permanent free availability.
+- [x] Contabo hosting and concluded DPA; VPS panel location EU. The exact
+  data-center country was not independently established.
+- [x] Contabo Auto Backup disabled; no customer snapshots shown. This is not
+  proof that provider-operated infrastructure copies do not exist.
+- [x] Cloudflare DNS, reverse proxy/HTTPS and edge/network services in use;
+  DPA incorporated into applicable standard self-service terms.
+- [x] Cloudflare automatic Web Analytics/RUM injection disabled; Logpush neither
+  subscribed to nor configured. HTTP request analytics/logs remain available,
+  including IP, timestamp, hostname/path, method and response status.
+- [x] Docker json-file rotation applied to frontend, backend, MCP and Caddy:
+  max-size 10m, max-file 3 per service. Size-based, not fixed time retention;
+  application services and Caddy use separate Compose stacks.
+- [x] systemd-journald SystemMaxUse=100M, MaxRetentionSec=14day; restarted and
+  active. Applies only to the system journal, not a universal log schedule.
+- [x] Two dedicated result Docker volumes; default result TTL 900 seconds,
+  periodic/request cleanup with failure and orphan caveats verified in source.
+- [x] PyMuPDF removed from new production backend/MCP images; pypdf 6.20.0 and
+  pypdfium2 5.14.0/PDFium retained. PDFium rendering verified on Contabo Linux;
+  all 16 public MCP tools verified after deployment (operator confirmation).
+- [x] Public checks after logging changes: https://konvertira.com/ HTTP 200,
+  https://api.konvertira.com/health healthy and
+  https://mcp.konvertira.com/health healthy (operator confirmation).
+
+## Still requires confirmation — publication gates
+
+- [ ] Legally required operator identification, lawful contact/postal/service
+  address and applicable disclosure requirements for the actual Croatian natural
+  person. No private address or invented identifiers have been published.
+- [ ] Applicability of business/trade registration, trader status, consumer and
+  e-commerce obligations even for a currently free service.
+- [ ] Final Croatian/EU-qualified legal review, including lawful bases and roles,
+  consumer safeguards, liability wording and language/accessibility requirements.
+- [ ] Contabo/Cloudflare provider-level retention, precise contracting entities,
+  provider access locations and relevant international-transfer mechanisms;
+  exact VPS data-center country if legally relevant. DPAs are not proof that all
+  transfers/access or every provider activity have been fully assessed.
+- [ ] Actual email provider, handling, retention, agreements and mailbox operation.
+- [ ] Cookie behaviour at the live edge and any required ePrivacy disclosures.
+- [ ] Practical data-subject request and incident-response procedures.
+- [ ] Complete third-party licensing review for shipped wheels, native/OS
+  components and historical images, including GCC Runtime Library Exception
+  conditions. Former PyMuPDF runtime blocker is remediated, not the entire audit.
+
+Detailed open assessments below remain applicable. Confirmed items must not be
+reopened as wholly unknown, nor used to mark broader legal questions complete.
+
+## Internal procedures — drafted, not operationally verified
+
+Local expired-download fix: token resolution and actual descriptor-backed delivery
+now check persistent expiry metadata independently of physical unlink. Startup
+and periodic cleanup remain space recovery, not the access security boundary.
+Legacy results without the new record are denied. See
+[storage/download implementation and limits](storage-downloads.md).
+This does not verify production cleanup, change provider/log retention, settle
+legal gates or mean the internal procedures have been operationally tested.
+
+Separate public-copy review required (not changed by this fix):
+`frontend/src/legal/privacy.json`, section `temporary-storage`, paragraphs 1–2,
+still describes mtime and availability after cleanup; section `retention-table`
+also describes TTL plus scheduling. Propose creation/expiry metadata and access
+denial at response start independent of cleanup, while preserving physical-copy
+caveats. `frontend/src/legal/security.json`, section `logging-deletion`, paragraph
+3 describes cleanup on relevant requests; propose distinguishing resolution-time
+expired cleanup from scheduled full-store cleanup. Generated public HTML should
+only be regenerated after a separate reviewed wording change, not in this task.
+
+Five internal templates were drafted on October 11, 2026:
+[GDPR requests](internal/GDPR_REQUESTS.md),
+[incident response](internal/INCIDENT_RESPONSE.md),
+[retention inventory](internal/DATA_RETENTION.md),
+[routine checklist](internal/PRIVACY_SECURITY_CHECKLIST.md) and
+[response templates](internal/RESPONSE_TEMPLATES.md).
+They contain no actual cases, secrets or private provider attachments; completed
+registers/evidence must be stored privately outside Git and public web roots.
+
+| Milestone | Status | Remaining evidence/action |
+| --- | --- | --- |
+| Procedure documented | Drafted only | Review against actual operations and contracts |
+| Procedure tested | Not tested | Synthetic rights-request and incident tabletop exercises |
+| Responsibility assigned | Not formally assigned/accepted | Matej Tokić is proposed owner; confirm mailbox habits, access and absence cover |
+| Legal review completed | Not completed | Roles, deadlines, exceptions, notification decisions and justified record retention |
+
+The open practical-request/incident procedure item above remains unchecked.
+Markdown/source consistency checks do not establish operational execution.
+Operator identification/address, registration, consumer duties, provider-level
+retention, transfers and broader licensing gates remain unresolved and unchanged.
+
 ## Release blockers and controller identity
 
 - [ ] Obtain Croatian/EU-qualified legal review of all three original English
   drafts, especially controller roles, consumer remedies and Terms section 22's
   narrowly qualified non-consumer loss exclusion. No numerical liability cap,
   mandatory arbitration, class-action waiver or consumer indemnity was added.
-- [ ] Confirm Matej Tokić is the legal operator/controller, his actual legal
-  capacity/status and any registration relevant to offering this service.
+- [x] Confirm Matej Tokić is the operator, an independent Croatian natural
+  person without a registered company/trade for this project. Applicable legal
+  capacity, controller roles and any required registration remain for review.
 - [ ] **PRE-PUBLICATION LEGAL REQUIREMENT:** provide a lawful postal/service
   address and all legally required controller/operator contact information.
   No private address was searched for or copied into this repository. Do not
@@ -26,8 +127,9 @@ An unchecked item is unknown or unconfirmed, not a negative answer.
   appointment. Determine Article 27 representative applicability; a Croatia-based
   establishment ordinarily presents a different question from a non-EU operator,
   but actual establishment and any exceptions must be assessed.
-- [ ] Resolve the provider, location, retention and transfer disclosures below.
-  The prominent public draft notices deliberately flag incomplete information.
+- [ ] Resolve remaining provider-level retention, access and transfer disclosures.
+  Hosting, DPAs and local logging controls are confirmed above; public draft
+  notices now distinguish those facts from outstanding information.
   Replace them with verified information only after review; do not just remove
   the warnings to make the pages appear complete.
 - [ ] Set the real effective/publication dates and any required change notice or
@@ -44,11 +146,11 @@ An unchecked item is unknown or unconfirmed, not a negative answer.
 | Stored results | `backend/services/storage.py`, download routes, `config.py` | Default 900-second result TTL; periodic 30–300-second cleanup, request-triggered cleanup, filesystem-error/outage caveats. No all-system or exact-second erasure claim. |
 | Input/intermediate files | `backend/processors/document.py`, background router | Memory buffers; LibreOffice temporary workspace/profile with normal cleanup. Result TTL is not an input-retention guarantee. |
 | Quotas/timeouts | `backend/services/rate_limit.py`, `resource_limits.py`, `config.py` | Per-process HTTP limits, global MCP gates, retained capacity for continuing work; no claim every HTTP job can be killed at a fixed deadline. |
-| Logging | `resource_limits.py`, Docker commands, Nginx | MCP operational tool/outcome/duration logs, disabled Uvicorn access logs in supplied commands; other log retention unknown. |
+| Logging | `resource_limits.py`, Docker commands, Nginx; operator-confirmed production settings above | MCP operational logs; Docker size rotation and journald rules have distinct scopes; Cloudflare request logs exist, provider periods unknown. |
 | Packages | `backend/services/metadata.py` | Bounded metadata archive parsing, encrypted/traversal checks, hardened XML; not a universal safety guarantee for all engines. |
 | Runtime | `docker-compose.yml`, both Dockerfiles | Non-root backend/MCP, dropped capabilities, no-new-privileges, loopback bindings and named volumes. The network named internal is a bridge, not `internal: true`. Frontend is not claimed non-root. No read-only rootfs/cgroup budgets asserted. |
 | Background removal | Processor, preparation/permission scripts, `docs/background-removal.md`, bundled Apache licence | U²-NetP, fixed URL/hash, CPU ONNX session, default one inference thread, no runtime download or external inference API, no training on uploads. |
-| Browser tracking | `frontend/src/`, public assets and Nginx inspection | No implemented analytics/advertising, accounts, persistent localStorage/sessionStorage profiles or cookie banner logic. Live edge cookies remain unknown. |
+| Browser tracking | `frontend/src/`, public assets and Nginx inspection; operator confirmation | No frontend Google/advertising analytics or persistent user profiles. Cloudflare RUM disabled; request analytics/logs still available. Live edge cookies remain unknown. |
 
 The requested `docker-compose.prod.yml` does **not** exist in this checkout;
 `docker-compose.yml` is the available source. No Caddy configuration or domain
@@ -82,11 +184,12 @@ facts by a hostname, documentation recommendation or provider brand.
 
 ## Providers, jurisdictions and transfers
 
-- [ ] Confirm whether Cloudflare actually provides DNS only, proxy/CDN, TLS
-  termination, bot management, analytics or other services; record contracting
-  entity, settings, subprocessors, data categories and locations.
-- [ ] Confirm whether Contabo hosts the service; record actual VPS region,
-  contracting entity, support/admin-access territories and backup service.
+- [x] Confirm Cloudflare DNS and reverse proxy/HTTPS traffic handling; RUM
+  disabled and Logpush inactive. Exact contracting entity, subprocessors,
+  access/data locations and other account features remain to be documented.
+- [x] Confirm Contabo hosting, EU panel region, concluded DPA and customer-facing
+  backup/snapshot state. Contracting entity, support/admin-access territories,
+  exact country and provider-level recovery/retention remain to be established.
 - [ ] Inventory email, DNS, proxy, monitoring, logging and any other providers.
   Distinguish code dependencies from hosted services receiving personal data.
 - [ ] Review provider contracts/DPA terms, controller/processor roles and
@@ -112,9 +215,10 @@ facts by a hostname, documentation recommendation or provider brand.
   Audit whether paths contain download tokens or signed URLs; establish redaction.
 - [ ] Establish mailbox, rights-request, complaint and incident-record retention
   schedules tied to purpose and specific legal obligations/claim periods.
-- [ ] Check VPS snapshots, named-volume backups and restore practices. Exclude
-  temporary uploads/results where appropriate and verify that exclusion in fact.
-  Document treatment of unavoidable historical copies and deletion cycles.
+- [x] Check customer-facing VPS backup/snapshot state: Auto Backup disabled and
+  no customer snapshots shown. Provider infrastructure mechanisms and historical
+  copies are not ruled out; their retention/deletion and restore practices remain
+  for review, including any future named-volume backup policy.
 - [ ] Test normal workspace cleanup and crashed-job/orphan recovery without
   promising cryptographic erasure or overwriting of provider media.
 - [ ] Review who can access processing files/logs and when operational access is
@@ -178,7 +282,10 @@ facts by a hostname, documentation recommendation or provider brand.
 - [x] PDF renderer migration: PyMuPDF removed from runtime requirements and local
   test environment; pypdf 6.20.0 remains for structure, pypdfium2 5.14.0/PDFium
   replaces rasterisation. The project's `All rights reserved` licence is unchanged.
-  See `docs/pdf-processing.md` for evidence, notices and production checks.
+  New production images no longer install it; PDFium rendering and all 16 MCP
+  tools were verified on the Linux deployment according to the operator.
+  See `docs/pdf-processing.md` for migration evidence and retained notices. Its
+  earlier local Docker-unavailable record is historical, not a production claim.
 - [ ] Review third-party redistribution notices for the actual shipped PDF wheel.
   BSD/Apache/MIT and native component notices are retained; the shared Dockerfile
   collects all installed PDF distribution licence files. This removes the former
@@ -204,6 +311,12 @@ facts by a hostname, documentation recommendation or provider brand.
 - [ ] Keep product/file ownership terms distinct from third-party licence rights.
 
 ## Authoritative research references
+
+Final update references: [Cloudflare customer DPA](https://www.cloudflare.com/cloudflare-customer-dpa/)
+describes its processor/subprocessor scope and incorporation into the main
+agreement. This does not establish roles for all Cloudflare activities or verify
+this customer's transfer/access facts. The GDPR text below was rechecked; no
+new legal-compliance conclusion or invented transfer mechanism was added.
 
 These sources inform a cautious draft; they do not establish its enforceability
 or that production complies. Some EUR-Lex HTML requests returned a JavaScript
@@ -273,6 +386,9 @@ mark Nginx/Docker or public HTTP verification passed unless it actually ran.
 
 ## Local implementation and validation record
 
+The following is the historical comprehensive-draft implementation record, not
+the changed-file list or newly executed checks for the final factual update.
+
 The original substantive drafts contain approximately 3,420 words in Terms
 (28 sections), 3,643 in Privacy (26 sections) and 1,997 in Security (16 sections),
 excluding the summary, table of contents and review notices. All three use a
@@ -333,3 +449,39 @@ Executed locally:
 
 No commit, push, merge, deployment, plugin submission or production configuration
 change was performed. Existing unrelated roadmap files were left untouched.
+
+## Final factual update — local validation, October 11, 2026
+
+Only these eight files changed in this update:
+
+- `frontend/src/legal/privacy.json`
+- `frontend/src/legal/terms.json`
+- `frontend/src/legal/security.json`
+- `frontend/public/privacy.html` (existing generator)
+- `frontend/public/terms.html` (existing generator)
+- `frontend/public/security.html` (existing generator)
+- `frontend/src/pages/legalPages.test.tsx`
+- `docs/legal-review-checklist.md`
+
+Existing structure, section IDs, TOC, React/static parity, navigation, styling,
+accessibility markup, direct Nginx routes and support page are preserved. Tests
+now cover confirmed operator/infrastructure disclosures and unresolved gates.
+Public wording does not promise universal 14-day log deletion, EEA-only access,
+exact-second file erasure, permanent free service or exclusively permissive
+Docker licensing. Existing consumer, rights, incident and liability safeguards
+were retained; their final legal assessment remains open above.
+
+Executed for this update:
+
+- `npm run legal:generate`: passed.
+- `npm run legal:check`: passed.
+- `npm test`: **46 passed, 8 test files passed**.
+- `npm run typecheck`: passed.
+- `npm run build`: passed (TypeScript and Vite production build).
+- `git diff --check`: passed, only Git LF/CRLF conversion warnings.
+
+No Python, configuration, API/MCP, environment, dependency, licence or model
+files changed. No production/Cloudflare settings changed. No fresh remote health,
+Docker, browser or deployment checks were performed for this wording update;
+operator-confirmed deployed checks are explicitly recorded separately above.
+No commit, push, deployment, publication or plugin submission was performed.

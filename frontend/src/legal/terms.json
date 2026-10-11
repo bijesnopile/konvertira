@@ -2,15 +2,15 @@
   "slug": "terms",
   "title": "Terms of Service",
   "updated": "October 11, 2026",
-  "summary": "Konvertira is a free, independently operated file-processing service. Choose the processing mode deliberately, keep your originals, and check every result. You retain your file rights; mandatory consumer and data-protection rights remain unaffected. This summary is a guide; the full Terms below govern subject to applicable law.",
+  "summary": "Konvertira is currently offered without charge as an independently operated file-processing service. Choose the processing mode deliberately, keep your originals, and check every result. You retain your file rights; mandatory consumer and data-protection rights remain unaffected. This summary is a guide; the full Terms below govern subject to applicable law.",
   "reviewNotice": "PRE-PUBLICATION LEGAL REQUIREMENT: The operator's legally required postal/service address and any applicable Croatian business identifiers must be confirmed and added before this draft is published. Consumer-information duties and these Terms require Croatian/EU-qualified legal review. No missing identity details are implied by this draft.",
   "sections": [
     {
       "id": "operator",
       "title": "1. Service and operator",
       "body": [
-        "<p>Konvertira is operated by Matej Tokić, an independent developer based in Croatia. References to Konvertira, the service, or the operator in these Terms mean this file-processing project and its operator, not an incorporated company that has not been identified. The public website is konvertira.com. Legal and privacy enquiries may be sent to <a href=\"mailto:legal@konvertira.com\">legal@konvertira.com</a>; technical support is available at <a href=\"mailto:support@konvertira.com\">support@konvertira.com</a>.</p>",
-        "<p>The service currently has no public user accounts, subscription checkout, advertising programme, financial trading, or audio or video conversion. It is maintained on limited independent infrastructure. This description does not remove any legal duties that apply to the operator, including duties that may arise even when a digital service is provided without a monetary charge.</p>"
+        "<p>Konvertira is operated by Matej Tokić, an independent natural person based in Croatia, not currently operating this project through a registered company or trade. References to Konvertira, the service, or the operator in these Terms mean this file-processing project and its operator, not an incorporated company that has not been identified. The public website is <a href=\"https://konvertira.com\">https://konvertira.com</a>. Legal and privacy enquiries may be sent to <a href=\"mailto:legal@konvertira.com\">legal@konvertira.com</a>; technical support is available at <a href=\"mailto:support@konvertira.com\">support@konvertira.com</a>.</p>",
+        "<p>Konvertira is currently offered without subscriptions, advertising, paid credits, checkout or other implemented monetisation. It has no public user accounts, financial trading, or audio or video conversion. It is maintained on limited independent infrastructure. This description does not remove any legal duties that apply to the operator, including duties that may arise even when a digital service is provided without a monetary charge.</p>"
       ]
     },
     {
@@ -42,7 +42,8 @@
       "title": "5. Availability, fair use and changes",
       "body": [
         "<p>Server capacity is shared and limited. File-size, decoded-pixel, document-output, PDF-page, request-rate, concurrency, time and temporary-storage limits apply. The service can reject a job immediately when busy rather than placing it in an indefinite queue. A timeout or error may mean no usable result is available. Limits and supported features may change for legitimate reasons such as safety, maintenance, dependency changes or sustainable operation.</p>",
-        "<p>No particular uptime, processing speed, file-size ceiling, roadmap date or uninterrupted availability is promised. Planned changes should be communicated where reasonably practicable and legally required; urgent security work may require immediate restriction. Do not circumvent quotas by rotating identities, coordinating excessive requests or repeatedly resubmitting harmful files. Existing statutory obligations, including any applicable duties concerning changes to digital services, are not displaced by the project's size or free availability.</p>"
+        "<p>No particular uptime, processing speed, file-size ceiling, roadmap date or uninterrupted availability is promised. Planned changes should be communicated where reasonably practicable and legally required; urgent security work may require immediate restriction. Do not circumvent quotas by rotating identities, coordinating excessive requests or repeatedly resubmitting harmful files. Existing statutory obligations, including any applicable duties concerning changes to digital services, are not displaced by the project's size or free availability.</p>",
+        "<p>Current free availability is not a promise that the service will remain free indefinitely. Features or pricing may change in future, subject to appropriate notice, any required agreement and applicable law. These Terms do not authorise an undisclosed charge, payment collection or retroactive pricing for an already completed request.</p>"
       ]
     },
     {
@@ -98,7 +99,7 @@
       "title": "12. Not a storage or backup service",
       "body": [
         "<p>Konvertira is not permanent storage, a file-sharing archive or a backup service. Many web operations return the result directly; MCP and certain compatibility routes temporarily store downloadable results. The default application result lifetime is approximately 15 minutes, with scheduled and request-triggered cleanup. Availability can end earlier because of failures or maintenance, and deletion timing is not a promise of exact-second erasure.</p>",
-        "<p>Download results promptly and keep them yourself. Anyone who obtains a valid temporary download URL may be able to use it until expiry; do not post it publicly. Application expiry does not establish deletion from OpenAI, browser downloads, proxy logs, caches or infrastructure snapshots. The Privacy Policy distinguishes those systems and identifies deployment information that remains to be verified.</p>"
+        "<p>Download results promptly and keep them yourself. Anyone who obtains a valid temporary download URL may be able to use it until expiry; do not post it publicly. Application expiry does not establish deletion from OpenAI, browser downloads, proxy logs, caches or infrastructure snapshots. The Privacy Policy distinguishes those systems and describes confirmed storage/logging controls and remaining provider-level questions.</p>"
       ]
     },
     {
@@ -106,7 +107,8 @@
       "title": "13. PDFs and document conversions",
       "body": [
         "<p>PDF operations include supported merge, extraction, split, reorder, deletion, rasterisation, image-to-PDF, metadata and structural optimisation workflows. Reordering requires a valid explicit order, and deleting all pages is rejected. Rasterisation creates images rather than editable text. Structural optimisation does not promise visual compression, image downsampling or a smaller file. A rewrite may affect bookmarks, forms, annotations, signatures or other document-level features.</p>",
-        "<p>Office and text conversion can change pagination, typography, embedded objects, links and layout. Fonts or legacy-format interpretation may differ from the application that created the file. Digital signatures and evidential properties may no longer be valid after rewriting. Konvertira does not certify authenticity, validate official records or preserve every interactive PDF feature. Encrypted PDFs are rejected by the current processors; no password-removal service is provided.</p>"
+        "<p>Office and text conversion can change pagination, typography, embedded objects, links and layout. Fonts or legacy-format interpretation may differ from the application that created the file. Digital signatures and evidential properties may no longer be valid after rewriting. Konvertira does not certify authenticity, validate official records or preserve every interactive PDF feature. Encrypted PDFs are rejected by the current processors; no password-removal service is provided.</p>",
+        "<p>Structural PDF processing uses pypdf; PDF-to-image rendering uses pypdfium2/PDFium after migration away from PyMuPDF. Rendering can differ in fonts, antialiasing or colour interpretation. Third-party notices accompany the distribution; this does not mean every native or operating-system component has an exclusively permissive licence.</p>"
       ]
     },
     {

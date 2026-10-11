@@ -76,6 +76,8 @@ def create_app() -> FastAPI:
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "no-referrer")
         response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+        if request.url.path.startswith("/download/"):
+            response.headers["Cache-Control"] = "no-store"
         return response
     application.include_router(health.router)
     application.include_router(metadata.router)

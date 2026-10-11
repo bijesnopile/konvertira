@@ -51,7 +51,7 @@ def configure_file_workflow(monkeypatch, tmp_path, content: bytes) -> None:
 
 
 def stored_content(tmp_path) -> bytes:
-    return next(path for path in tmp_path.iterdir() if path.is_file()).read_bytes()
+    return next(path for path in tmp_path.iterdir() if path.is_file() and not path.name.startswith('.')).read_bytes()
 
 
 def test_tool_registration_schemas_and_annotations() -> None:
@@ -139,7 +139,7 @@ def test_convert_image_uses_shared_processor_and_temporary_storage(monkeypatch, 
     assert result.success is True
     assert result.filename == "photo.jpg"
     assert result.content_type == "image/jpeg"
-    assert len(tuple(tmp_path.iterdir())) == 1
+    assert len(tuple(path for path in tmp_path.iterdir() if not path.name.startswith('.'))) == 1
 
 
 def test_convert_image_passes_target_size_and_background_to_shared_processor(monkeypatch, tmp_path) -> None:
@@ -269,8 +269,8 @@ def test_real_pdf_render_mcp_and_result_expiration(monkeypatch, tmp_path, format
         assert archive.namelist() == [f"page-0001.{extension}", f"page-0002.{extension}"]
         with Image.open(io.BytesIO(archive.read(archive.namelist()[0]))) as image:
             assert image.size == (300, 60)
-    stored = next(tmp_path.iterdir())
-    assert common.mcp_storage.cleanup(now=stored.stat().st_mtime + 901) == 1
+    stored = next(path for path in tmp_path.iterdir() if not path.name.startswith('.'))
+    assert common.mcp_storage.cleanup(now=stored.stat().st_mtime + 901) == 2
     assert not list(tmp_path.iterdir())
 
 

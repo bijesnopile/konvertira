@@ -25,10 +25,10 @@ def test_storage_rejects_unsafe_token(tmp_path) -> None:
 
 
 def test_storage_enforces_total_capacity(tmp_path) -> None:
-    storage = TemporaryStorage(tmp_path, ttl_seconds=60, max_bytes=5)
-    storage.save(b"123", ".jpg")
+    storage = TemporaryStorage(tmp_path, ttl_seconds=60, max_bytes=700)
+    storage.save(b"1" * 300, ".jpg")
     with pytest.raises(StorageCapacityError):
-        storage.save(b"456", ".png")
+        storage.save(b"2" * 300, ".png")
 
 
 def test_storage_rejects_unsafe_extension(tmp_path) -> None:

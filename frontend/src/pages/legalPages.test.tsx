@@ -139,6 +139,33 @@ describe('crawler-readable legal pages', () => {
     expect(css).not.toContain('color-scheme: dark') // Existing site is light-only.
   })
 
+  it('discloses confirmed operator and infrastructure without treating open questions as settled', () => {
+    const privacy = text(read('../../public/privacy.html'))
+    const security = text(read('../../public/security.html'))
+    const terms = text(read('../../public/terms.html'))
+    for (const page of [privacy, security]) {
+      for (const phrase of ['Contabo', 'Cloudflare', 'DPA', 'Logpush', 'RUM', 'max-size 10m', 'max-file 3', 'SystemMaxUse=100M', 'MaxRetentionSec=14day', 'system journal', 'Auto Backup', 'customer snapshots', 'two dedicated Docker volumes']) expect(page).toContain(phrase)
+      expect(page).not.toMatch(/deployment candidates|possible deployment providers|deleted after 14 days|exclusively in Germany|guaranteed EEA-only/)
+    }
+    for (const page of [privacy, terms]) {
+      expect(page).toContain('independent natural person based in Croatia')
+      expect(page).toContain('not currently operating this project through a registered company or trade')
+    }
+    expect(terms).toContain('not a promise that the service will remain free indefinitely')
+    expect(privacy).toContain('not a fixed retention period')
+    expect(privacy).toContain('not automatically described here as Konvertira\'s processor')
+    expect(privacy).toContain('exact data-center country has not been independently established')
+    for (const phrase of ['pypdf 6.20.0', 'pypdfium2 5.14.0/PDFium', 'all 16 public MCP tools', 'GCC Runtime Library Exception']) expect(security).toContain(phrase)
+  })
+
+  it('keeps broader publication gates open despite confirmed deployment facts', () => {
+    const checklist = read('../../../docs/legal-review-checklist.md')
+    expect(checklist).toContain('## Verified and completed')
+    expect(checklist).toContain('## Still requires confirmation')
+    for (const phrase of ['- [ ] Legally required operator identification', '- [ ] Applicability of business/trade registration', '- [ ] Final Croatian/EU-qualified legal review', '- [ ] Actual email provider', '- [ ] Cookie behaviour at the live edge', '- [ ] Practical data-subject request', '- [ ] Complete third-party licensing review']) expect(checklist).toContain(phrase)
+    expect(checklist).toContain('operator confirmation')
+  })
+
   it('links security in the React footer, metadata and sitemap without changing robots', () => {
     const footer = renderToStaticMarkup(<MemoryRouter><Footer /></MemoryRouter>)
     for (const route of ['/terms', '/privacy', '/security', '/support', '/about']) expect(hrefs(footer)).toContain(route)
